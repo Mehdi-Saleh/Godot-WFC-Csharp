@@ -1,0 +1,69 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "WFC-2d/1.0.0": {
+        "dependencies": {
+          "Godot.SourceGenerators": "4.1.3",
+          "GodotSharp": "4.1.3",
+          "GodotSharpEditor": "4.1.3"
+        },
+        "runtime": {
+          "WFC-2d.dll": {}
+        }
+      },
+      "Godot.SourceGenerators/4.1.3": {},
+      "GodotSharp/4.1.3": {
+        "runtime": {
+          "lib/net6.0/GodotSharp.dll": {
+            "assemblyVersion": "4.1.3.0",
+            "fileVersion": "4.1.3.0"
+          }
+        }
+      },
+      "GodotSharpEditor/4.1.3": {
+        "dependencies": {
+          "GodotSharp": "4.1.3"
+        },
+        "runtime": {
+          "lib/net6.0/GodotSharpEditor.dll": {
+            "assemblyVersion": "4.1.3.0",
+            "fileVersion": "4.1.3.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "WFC-2d/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Godot.SourceGenerators/4.1.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zlwbjkkdK2Rnc2e/DxB3NIKYOC/gbxxPPuawvhn13pUFGa7kEw6mytYF2NgukTTstSP+qnfp18RAc2KM1q3kLw==",
+      "path": "godot.sourcegenerators/4.1.3",
+      "hashPath": "godot.sourcegenerators.4.1.3.nupkg.sha512"
+    },
+    "GodotSharp/4.1.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Nj9zvKgCyz3pXgwdOnuWl4Y7ehpcUV2lnMJGgJI+t9fpICz04XVGZsjOXbdnte7B51/p3nEDDDDMWDZTAkpveQ==",
+      "path": "godotsharp/4.1.3",
+      "hashPath": "godotsharp.4.1.3.nupkg.sha512"
+    },
+    "GodotSharpEditor/4.1.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-h8ZC/h9s88hRRVhe4I4ayWmoCdrqSDDEbb0i3bphhr8KblHUdrOjhLcjv8o83z5lhojFvhOgwpwpbXBtY8Hs1Q==",
+      "path": "godotsharpeditor/4.1.3",
+      "hashPath": "godotsharpeditor.4.1.3.nupkg.sha512"
+    }
+  }
+}

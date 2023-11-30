@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d341tqusccn22"
+path="res://.godot/imported/roadTile_118.obj-ec8d5b5a5bfd5c9ae326deb395f5a705.mesh"
+
+[deps]
+
+files=["res://.godot/imported/roadTile_118.obj-ec8d5b5a5bfd5c9ae326deb395f5a705.mesh"]
+
+source_file="res://Assets/Kenney/RoadTiles/roadTile_118.obj"
+dest_files=["res://.godot/imported/roadTile_118.obj-ec8d5b5a5bfd5c9ae326deb395f5a705.mesh", "res://.godot/imported/roadTile_118.obj-ec8d5b5a5bfd5c9ae326deb395f5a705.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(-1.5, 0, 1.5)
+optimize_mesh=true

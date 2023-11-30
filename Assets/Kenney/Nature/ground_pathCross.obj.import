@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cuplvkuqrmfj1"
+path="res://.godot/imported/ground_pathCross.obj-6f359d2d648cdd44ec112e1e40bc704c.mesh"
+
+[deps]
+
+files=["res://.godot/imported/ground_pathCross.obj-6f359d2d648cdd44ec112e1e40bc704c.mesh"]
+
+source_file="res://Assets/Kenney/Nature/ground_pathCross.obj"
+dest_files=["res://.godot/imported/ground_pathCross.obj-6f359d2d648cdd44ec112e1e40bc704c.mesh", "res://.godot/imported/ground_pathCross.obj-6f359d2d648cdd44ec112e1e40bc704c.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://mosn7uskhgr2"
+path="res://.godot/imported/ground_pathOpen.obj-e43aae220db4a6426e8394a9bcd4856a.mesh"
+
+[deps]
+
+files=["res://.godot/imported/ground_pathOpen.obj-e43aae220db4a6426e8394a9bcd4856a.mesh"]
+
+source_file="res://Assets/Kenney/Nature/ground_pathOpen.obj"
+dest_files=["res://.godot/imported/ground_pathOpen.obj-e43aae220db4a6426e8394a9bcd4856a.mesh", "res://.godot/imported/ground_pathOpen.obj-e43aae220db4a6426e8394a9bcd4856a.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

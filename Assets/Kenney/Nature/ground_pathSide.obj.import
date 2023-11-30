@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dlhh140b4ltqw"
+path="res://.godot/imported/ground_pathSide.obj-89fd62be2d107713caeb95b5a4b104af.mesh"
+
+[deps]
+
+files=["res://.godot/imported/ground_pathSide.obj-89fd62be2d107713caeb95b5a4b104af.mesh"]
+
+source_file="res://Assets/Kenney/Nature/ground_pathSide.obj"
+dest_files=["res://.godot/imported/ground_pathSide.obj-89fd62be2d107713caeb95b5a4b104af.mesh", "res://.godot/imported/ground_pathSide.obj-89fd62be2d107713caeb95b5a4b104af.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

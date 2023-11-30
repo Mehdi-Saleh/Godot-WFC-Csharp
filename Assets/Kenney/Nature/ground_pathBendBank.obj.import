@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://qockcouv8nk3"
+path="res://.godot/imported/ground_pathBendBank.obj-135cb701b3659b53e1c1befea13a37f2.mesh"
+
+[deps]
+
+files=["res://.godot/imported/ground_pathBendBank.obj-135cb701b3659b53e1c1befea13a37f2.mesh"]
+
+source_file="res://Assets/Kenney/Nature/ground_pathBendBank.obj"
+dest_files=["res://.godot/imported/ground_pathBendBank.obj-135cb701b3659b53e1c1befea13a37f2.mesh", "res://.godot/imported/ground_pathBendBank.obj-135cb701b3659b53e1c1befea13a37f2.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

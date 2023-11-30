@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "Eva3MUsjh/dq7C1Tq4/8qSLjiJ+ntIAYgjFdG3qcl0UD0BDb6Hmc/kSpx8OfEFLkYWjEpw2JruF0RaGDy/OeAg==",
+  "success": true,
+  "projectFilePath": "/home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/WFC-2d.csproj",
+  "expectedPackageFiles": [
+    "/home/mehdi/.nuget/packages/godot.sourcegenerators/4.1.3/godot.sourcegenerators.4.1.3.nupkg.sha512",
+    "/home/mehdi/.nuget/packages/godotsharp/4.1.3/godotsharp.4.1.3.nupkg.sha512",
+    "/home/mehdi/.nuget/packages/godotsharpeditor/4.1.3/godotsharpeditor.4.1.3.nupkg.sha512"
+  ],
+  "logs": []
+}
