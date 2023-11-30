@@ -6,7 +6,7 @@ public partial class WFCGenerator : Node2D
 {
 	private bool done = false;
 	private Vector2I Vector_1 = new Vector2I(-1,-1);
-	[Export] private const int H=15, V=15; // Map size, horizontal and vertical
+	[Export] private const int H=30, V=30; // Map size, horizontal and vertical
 	[Export] public const int MATCH_RADIUS = 1;
 	private int maxN; // Total number of tiles which need to be set
 	private int currentN=0; // Number of tiles that are currently set
@@ -51,13 +51,16 @@ public partial class WFCGenerator : Node2D
 		}
 		if (currentN>=maxN)
 		{
+			GD.Print("Done!");
 			done = true;
 			return;
 		}
 		
 		Vector2I nextTile = GetNextTile(); // Find the next tile to set
+		GD.Print(nextTile, tileMapCount[nextTile[0], nextTile[1]]);
 		List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
 		SetTile(nextTile, options[(int)(GD.Randi()%options.Count)]); // Set tile to a random possible option
+		UpdateCountRadius(nextTile, MATCH_RADIUS);
 		
 		if (showProgress)
 		{
@@ -159,14 +162,13 @@ public partial class WFCGenerator : Node2D
 				}
 			if (f) options.Add(usedTile);
 		}
-		GD.Print(options.Count);
 		return options;
 	}
 	
 	// Returns the tile with the least possible options. 
 	private Vector2I GetNextTile()
 	{
-		UpdateCountAll();
+		// UpdateCountAll();
 		Vector2I bestTile = new Vector2I(0,0);
 		int leastOptions = int.MaxValue;
 		for (int i=0; i<H; i++)
@@ -212,7 +214,6 @@ public partial class WFCGenerator : Node2D
 					continue;
 				}
 				Vector2I tempCoord = new Vector2I(i,j);
-				GD.Print(tempCoord);
 				if (GetTile(tempCoord)!=Vector_1) 
 					tileMapCount[i,j]=0;
 				else
