@@ -12,6 +12,8 @@ public partial class WFCGenerator : Node2D
 	private int currentN=0; // Number of tiles that are currently set
 	[Export] public TileMap target;
 	[Export] public TileMap sample;
+
+	[Export] public bool showProgress = true; // If you know the code works for you disable this as it has a big impact on performance
 	
 	private int tempI = 0, tempJ = 0;
 	
@@ -21,7 +23,7 @@ public partial class WFCGenerator : Node2D
 	private PriorityQueue<Vector2I, int> queue = new PriorityQueue<Vector2I, int>();
 	
 	
-	// Holds tiles data for internal use only CURRENTLY UNUSED
+	// Holds tiles data for internal use only. DO NOT USED DIRECTLY! Use SetTile() and GetTile() instead
 	private Vector2I[,] tileMapArray = new Vector2I[H+MATCH_RADIUS*2,V+MATCH_RADIUS*2]; 
 	
 	
@@ -37,8 +39,11 @@ public partial class WFCGenerator : Node2D
 	// Called every frame
 	public override void _Process(double delta)
 	{
-		if (done) return;
-		
+		if (done)
+		{
+			ApplyTileMap();
+			return;
+		}
 		if (currentN>=maxN)
 		{
 			done = true;
@@ -47,20 +52,25 @@ public partial class WFCGenerator : Node2D
 		
 		Vector2I nextTile = GetNextTile(); // Find the next tile to set
 		List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
-		target.SetCell(0, nextTile, 1, options[(int)(GD.Randi()%options.Count)]); // Set tile to a random possible option
+		SetTile(nextTile, options[(int)(GD.Randi()%options.Count)]); // Set tile to a random possible option
 		
+		if (showProgress)
+		{
+			ApplyTileMap();
+		}
+
 		currentN++;
 	}
 	
 	// Applies the tiles array to the target tile map
-//	public void ApplyTileMap()
-//	{
-//		for (int i=0; i<H; i++)
-//			for (int j=0; j<V; j++)
-//			{
-//				target.SetCell(0, new Vector2I(i,j), 1, tileMapArray[i,j]);
-//			}
-//	}
+	public void ApplyTileMap()
+	{
+		for (int i=0; i<H; i++)
+			for (int j=0; j<V; j++)
+			{
+				target.SetCell(0, new Vector2I(i,j), 1, GetTile(i,j));
+			}
+	}
 	
 	// Analyses sample for rules. Must be called once before on ready
 	public void Init()
@@ -77,7 +87,6 @@ public partial class WFCGenerator : Node2D
 			usedTiles[atlasCoord].Add(cell);
 		}
 	}
-	
 	// Returns the number of possible options for the given tile coordinates
 	private int GetOptionsCount(Vector2I coord)
 	{
@@ -92,11 +101,11 @@ public partial class WFCGenerator : Node2D
 					bool anyMatch = false;
 					foreach (Vector2I occurance in usedTiles[usedTile])
 					{
-						if (target.GetCellAtlasCoords(0, coord+new Vector2I(i,j))==Vector_1)
+						if (GetTile(coord+new Vector2I(i,j))==Vector_1)
 						{
 							anyMatch = true;
 						}
-						if (sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))==target.GetCellAtlasCoords(0, coord+new Vector2I(i,j)))
+						if (sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))==GetTile(coord+new Vector2I(i,j)))
 						{
 							anyMatch = true;
 						}
@@ -109,9 +118,9 @@ public partial class WFCGenerator : Node2D
 				}
 			if (f) count++;
 		}
+
 		return count;
 	}
-	
 	// Returns all possible options for the given tile coordinates
 	private List<Vector2I> GetOptions(Vector2I coord)
 	{
@@ -126,12 +135,12 @@ public partial class WFCGenerator : Node2D
 					bool anyMatch = false;
 					foreach (Vector2I occurance in usedTiles[usedTile])
 					{
-						if (target.GetCellAtlasCoords(0,coord+new Vector2I(i,j))==Vector_1)
+						if (GetTile(coord+new Vector2I(i,j))==Vector_1)
 						{
 							anyMatch = true;
 							break;
 						}
-						if (sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))==target.GetCellAtlasCoords(0,coord+new Vector2I(i,j)))
+						if (sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))==GetTile(coord+new Vector2I(i,j)))
 						{
 							anyMatch = true;
 							break;
@@ -158,7 +167,7 @@ public partial class WFCGenerator : Node2D
 			for (int j=0; j<V; j++)
 			{
 				Vector2I coord = new Vector2I(i,j);
-				if (target.GetCellAtlasCoords(0, coord)!=Vector_1) continue;
+				if (GetTile(coord)!=Vector_1) continue;
 				int count = GetOptionsCount(coord);
 				if (count<leastOptions && count>0)
 				{
@@ -167,9 +176,9 @@ public partial class WFCGenerator : Node2D
 					bestTile[1] = j;
 				}
 			}
-		GD.Print(bestTile);
 		return bestTile;
 	}
+	
 	
 	// Returns true if the specified Vector2 is in the given list NEED OPTIMIVATION,NOT USED!
 	private bool IsInList(Vector2I atlasCoord, Vector2I[] targetList)
@@ -189,5 +198,27 @@ public partial class WFCGenerator : Node2D
 			{
 				tileMapArray[i,j] = Vector_1;
 			}
+	}
+
+	// Get tile from tileMapArray using coordinates
+	private Vector2I GetTile(int coordX, int coordY)
+	{
+		return tileMapArray[coordX+MATCH_RADIUS, coordY+MATCH_RADIUS];
+	}
+	// Get tile from tileMapArray using coordinates
+	private Vector2I GetTile(Vector2I coord)
+	{
+		return GetTile(coord[0], coord[1]);
+	}
+
+	// Set tile on tileMapArray using coordinates
+	private void SetTile(int coordX, int coordY, Vector2I value)
+	{
+		tileMapArray[coordX+MATCH_RADIUS, coordY+MATCH_RADIUS] = value;
+	}
+	// Set tile on tileMapArray using coordinates
+	private void SetTile(Vector2I coord, Vector2I value)
+	{
+		SetTile(coord[0], coord[1], value);
 	}
 }
