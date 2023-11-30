@@ -37,6 +37,8 @@ public partial class WFCGenerator : Node2D
 		maxN = H*V;
 		Init(); // Needs to be called to initialize usedTiles (to create rules)
 		ClearMap();
+		UpdateCountAll();
+		UpdateCountRadius(new Vector2I(0,0), 1);
 	}
 	
 	// Called every frame
@@ -181,6 +183,7 @@ public partial class WFCGenerator : Node2D
 	}
 
 
+	// Updates all options counts
 	private void UpdateCountAll()
 	{
 		for (int i=0; i<H; i++)
@@ -191,6 +194,29 @@ public partial class WFCGenerator : Node2D
 					tileMapCount[i,j]=0;
 				else
 					tileMapCount[i,j] = GetOptionsCount(coord);
+			}
+	}
+
+	private void UpdateCountRadius(Vector2I coord, int radius)
+	{
+		for (int i=coord[0]-radius; i<=coord[0]+radius; i++)
+			for (int j=coord[1]-radius; j<=coord[1]+radius; j++)
+			{
+				if (
+					i<0
+					|| j<0
+					|| i>=H
+					|| j>=V
+				)
+				{
+					continue;
+				}
+				Vector2I tempCoord = new Vector2I(i,j);
+				GD.Print(tempCoord);
+				if (GetTile(tempCoord)!=Vector_1) 
+					tileMapCount[i,j]=0;
+				else
+					tileMapCount[i,j] = GetOptionsCount(tempCoord);
 			}
 	}
 	
