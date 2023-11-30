@@ -7,6 +7,7 @@ Features:
 - Create map based on a sample
 - Differnt match levels are possible (through changing MATCH_RADIUS)
 - Multithreading
+  
 To Do:
 - Fail correction
 - Possibality analysis from sample
