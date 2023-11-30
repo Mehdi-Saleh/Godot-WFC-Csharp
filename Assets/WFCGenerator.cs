@@ -25,6 +25,9 @@ public partial class WFCGenerator : Node2D
 	
 	// Holds tiles data for internal use only. DO NOT USED DIRECTLY! Use SetTile() and GetTile() instead
 	private Vector2I[,] tileMapArray = new Vector2I[H+MATCH_RADIUS*2,V+MATCH_RADIUS*2]; 
+
+	// Holds possible options counts
+	private int[,] tileMapCount = new int[H,V]; 
 	
 	
 	// Called when the node enters the scene tree for the first time.
@@ -161,22 +164,34 @@ public partial class WFCGenerator : Node2D
 	// Returns the tile with the least possible options. 
 	private Vector2I GetNextTile()
 	{
+		UpdateCountAll();
 		Vector2I bestTile = new Vector2I(0,0);
-		int leastOptions = usedTiles.Count;
+		int leastOptions = int.MaxValue;
 		for (int i=0; i<H; i++)
 			for (int j=0; j<V; j++)
 			{
-				Vector2I coord = new Vector2I(i,j);
-				if (GetTile(coord)!=Vector_1) continue;
-				int count = GetOptionsCount(coord);
-				if (count<leastOptions && count>0)
+				if (tileMapCount[i,j]<leastOptions && tileMapCount[i,j]>0)
 				{
-					leastOptions = count;
+					leastOptions = tileMapCount[i,j];
 					bestTile[0] = i;
 					bestTile[1] = j;
 				}
 			}
 		return bestTile;
+	}
+
+
+	private void UpdateCountAll()
+	{
+		for (int i=0; i<H; i++)
+			for (int j=0; j<V; j++)
+			{
+				Vector2I coord = new Vector2I(i,j);
+				if (GetTile(coord)!=Vector_1) 
+					tileMapCount[i,j]=0;
+				else
+					tileMapCount[i,j] = GetOptionsCount(coord);
+			}
 	}
 	
 	
