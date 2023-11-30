@@ -1,12 +1,14 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 public partial class WFCGenerator : Node2D
 {
 	private bool done = false;
 	private Vector2I Vector_1 = new Vector2I(-1,-1);
-	[Export] private const int H=30, V=30; // Map size, horizontal and vertical
+	[Export] private const int H=50, V=30; // Map size, horizontal and vertical
 	[Export] public const int MATCH_RADIUS = 1;
 	private int maxN; // Total number of tiles which need to be set
 	private int currentN=0; // Number of tiles that are currently set
@@ -57,7 +59,7 @@ public partial class WFCGenerator : Node2D
 		}
 		
 		Vector2I nextTile = GetNextTile(); // Find the next tile to set
-		GD.Print(nextTile, tileMapCount[nextTile[0], nextTile[1]]);
+		// GD.Print(nextTile, tileMapCount[nextTile[0], nextTile[1]]);
 		List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
 		SetTile(nextTile, options[(int)(GD.Randi()%options.Count)]); // Set tile to a random possible option
 		UpdateCountRadius(nextTile, MATCH_RADIUS);
@@ -126,7 +128,7 @@ public partial class WFCGenerator : Node2D
 				}
 			if (f) count++;
 		}
-
+		GD.Print("done2");
 		return count;
 	}
 	// Returns all possible options for the given tile coordinates
@@ -168,7 +170,6 @@ public partial class WFCGenerator : Node2D
 	// Returns the tile with the least possible options. 
 	private Vector2I GetNextTile()
 	{
-		// UpdateCountAll();
 		Vector2I bestTile = new Vector2I(0,0);
 		int leastOptions = int.MaxValue;
 		for (int i=0; i<H; i++)
@@ -201,6 +202,8 @@ public partial class WFCGenerator : Node2D
 
 	private void UpdateCountRadius(Vector2I coord, int radius)
 	{
+		List<Task<int>> tasks = new List<Task<int>>();
+		List<int[]> counts = new List<int[]>();
 		for (int i=coord[0]-radius; i<=coord[0]+radius; i++)
 			for (int j=coord[1]-radius; j<=coord[1]+radius; j++)
 			{
@@ -217,8 +220,21 @@ public partial class WFCGenerator : Node2D
 				if (GetTile(tempCoord)!=Vector_1) 
 					tileMapCount[i,j]=0;
 				else
-					tileMapCount[i,j] = GetOptionsCount(tempCoord);
+				{
+					// tasks.Add(Task.Run(() => {counts.Add(new int[3](i,j,GetOptionsCount(tempCoord))); GD.Print("done");}));
+					tasks.Add(Task<int>.Factory.StartNew(() => {return GetOptionsCount(tempCoord);}));
+					counts.Add(new int[2]);
+					counts[counts.Count-1][0] = i;
+					counts[counts.Count-1][1] = j;
+					// tileMapCount[i,j]=GetOptionsCount(tempCoord);
+				}
 			}
+		Task.WaitAll(tasks.ToArray());
+		for (int i=0; i<tasks.Count; i++)
+		{
+			tileMapCount[counts[i][0], counts[i][1]] = tasks[i].Result;
+		}
+		GD.Print("all done");
 	}
 	
 	
