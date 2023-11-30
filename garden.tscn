@@ -1,10 +1,10 @@
 [gd_scene load_steps=5 format=3 uid="uid://b6unulsuw2ewh"]
 
-[ext_resource type="Texture2D" uid="uid://dw8aiakn0sc1f" path="res://colored_packed.png" id="1_e6fah"]
-[ext_resource type="Script" path="res://WFCGenerator.cs" id="1_jkm4q"]
+[ext_resource type="Script" path="res://Assets/WFCGenerator.cs" id="1_aghwr"]
+[ext_resource type="Texture2D" uid="uid://dw8aiakn0sc1f" path="res://Assets/colored_packed.png" id="2_gn0ki"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_oic0k"]
-texture = ExtResource("1_e6fah")
+texture = ExtResource("2_gn0ki")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -1070,11 +1070,11 @@ sources/1 = SubResource("TileSetAtlasSource_oic0k")
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="WFC Generator" type="Node2D" parent="." node_paths=PackedStringArray("target", "sample")]
-script = ExtResource("1_jkm4q")
-target = NodePath("TileMap")
+script = ExtResource("1_aghwr")
+target = NodePath("Target")
 sample = NodePath("Sample")
 
-[node name="TileMap" type="TileMap" parent="WFC Generator"]
+[node name="Target" type="TileMap" parent="WFC Generator"]
 tile_set = SubResource("TileSet_hpvuk")
 format = 2
 
