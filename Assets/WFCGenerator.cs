@@ -7,11 +7,11 @@ public partial class WFCGenerator : Node2D
 	private bool done = false;
 	private Vector2I Vector_1 = new Vector2I(-1,-1);
 	[Export] private const int H=15, V=15; // Map size, horizontal and vertical
+	[Export] public const int MATCH_RADIUS = 1;
 	private int maxN; // Total number of tiles which need to be set
 	private int currentN=0; // Number of tiles that are currently set
 	[Export] public TileMap target;
 	[Export] public TileMap sample;
-	[Export] public int matchRadius = 1;
 	
 	private int tempI = 0, tempJ = 0;
 	
@@ -22,7 +22,7 @@ public partial class WFCGenerator : Node2D
 	
 	
 	// Holds tiles data for internal use only CURRENTLY UNUSED
-	private Vector2I[,] tilesArray = new Vector2I[H,V]; 
+	private Vector2I[,] tileMapArray = new Vector2I[H+MATCH_RADIUS*2,V+MATCH_RADIUS*2]; 
 	
 	
 	// Called when the node enters the scene tree for the first time.
@@ -31,16 +31,7 @@ public partial class WFCGenerator : Node2D
 		sample.Hide();
 		maxN = H*V;
 		Init(); // Needs to be called to initialize usedTiles (to create rules)
-		
-		// set all tiles to unset (-1)
-//		for (int i=0; i<H; i++)
-//			for (int j=0; j<V; j++)
-//			{
-//				tilesArray[i,j] = new Vector2I(-1,-1);
-//			}
-//
-//		//tilesArray[1,3] = new Vector2I(1,1);
-//		ApplyTileMap();
+		ClearMap();
 	}
 	
 	// Called every frame
@@ -67,7 +58,7 @@ public partial class WFCGenerator : Node2D
 //		for (int i=0; i<H; i++)
 //			for (int j=0; j<V; j++)
 //			{
-//				target.SetCell(0, new Vector2I(i,j), 1, tilesArray[i,j]);
+//				target.SetCell(0, new Vector2I(i,j), 1, tileMapArray[i,j]);
 //			}
 //	}
 	
@@ -95,8 +86,8 @@ public partial class WFCGenerator : Node2D
 		{
 			bool f = true, b=false;
 			int i, j;
-			for (i=-matchRadius; i<=matchRadius&&!b; i++)
-				for (j=-matchRadius; j<=matchRadius&&!b; j++)
+			for (i=-MATCH_RADIUS; i<=MATCH_RADIUS&&!b; i++)
+				for (j=-MATCH_RADIUS; j<=MATCH_RADIUS&&!b; j++)
 				{
 					bool anyMatch = false;
 					foreach (Vector2I occurance in usedTiles[usedTile])
@@ -129,8 +120,8 @@ public partial class WFCGenerator : Node2D
 		{
 			bool f = true, b=false;
 			int i=0, j=0;
-			for (i=-matchRadius; i<=matchRadius&&!b; i++)
-				for (j=-matchRadius; j<=matchRadius&&!b; j++)
+			for (i=-MATCH_RADIUS; i<=MATCH_RADIUS&&!b; i++)
+				for (j=-MATCH_RADIUS; j<=MATCH_RADIUS&&!b; j++)
 				{
 					bool anyMatch = false;
 					foreach (Vector2I occurance in usedTiles[usedTile])
@@ -188,5 +179,15 @@ public partial class WFCGenerator : Node2D
 			if (v == atlasCoord) return true;
 		}
 		return false;
+	}
+
+	// Set every tileMapArray cell to (-1, -1)
+	private void ClearMap()
+	{
+		for (int i=0; i<H+MATCH_RADIUS*2; i++)
+			for (int j=0; j<V+MATCH_RADIUS*2; j++)
+			{
+				tileMapArray[i,j] = Vector_1;
+			}
 	}
 }
