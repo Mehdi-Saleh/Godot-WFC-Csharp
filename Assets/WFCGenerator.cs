@@ -9,67 +9,91 @@ public partial class WFCGenerator : Node2D
 	private bool done = false;
 	private Vector2I Vector_1 = new Vector2I(-1,-1);
 	[Export] private const int H=50, V=30; // Map size, horizontal and vertical
-	[Export] public const int MATCH_RADIUS = 1;
+	[Export] public const int MATCH_RADIUS = 1; // The radius around a tile check for matching tiles with sample
 	private int maxN; // Total number of tiles which need to be set
 	private int currentN=0; // Number of tiles that are currently set
 	[Export] public TileMap target;
 	[Export] public TileMap sample;
 
-	[Export] public bool showProgress = true; // If you know the code works for you disable this as it has a big impact on performance
+	[Export] public bool showProgress = true; // If you know the code works for you disable this as it may impact performance
 	
-	private int tempI = 0, tempJ = 0;
 	
 	// Holds tile occurances in the sample for future use as rules
 	private Dictionary<Vector2I, List<Vector2I>> usedTiles = new Dictionary<Vector2I, List<Vector2I>>();
-	
-	private PriorityQueue<Vector2I, int> queue = new PriorityQueue<Vector2I, int>();
-	
 	
 	// Holds tiles data for internal use only. DO NOT USED DIRECTLY! Use SetTile() and GetTile() instead
 	private Vector2I[,] tileMapArray = new Vector2I[H+MATCH_RADIUS*2,V+MATCH_RADIUS*2]; 
 
 	// Holds possible options counts
 	private int[,] tileMapCount = new int[H,V]; 
+
+	private Task generationTask;
+	private bool taskLastState = true; // true means done
+
+
+	[Signal] public delegate void OnDoneEventHandler(); // emitted on end of generation
 	
 	
 	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		sample.Hide();
 		maxN = H*V;
 		Init(); // Needs to be called to initialize usedTiles (to create rules)
 		ClearMap();
 		UpdateCountAll();
-		UpdateCountRadius(new Vector2I(0,0), 1);
+		GenerateMap();
 	}
-	
+
+
 	// Called every frame
 	public override void _Process(double delta)
 	{
-		if (done)
-		{
-			ApplyTileMap();
-			return;
-		}
-		if (currentN>=maxN)
-		{
-			GD.Print("Done!");
-			done = true;
-			return;
-		}
-		
-		Vector2I nextTile = GetNextTile(); // Find the next tile to set
-		// GD.Print(nextTile, tileMapCount[nextTile[0], nextTile[1]]);
-		List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
-		SetTile(nextTile, options[(int)(GD.Randi()%options.Count)]); // Set tile to a random possible option
-		UpdateCountRadius(nextTile, MATCH_RADIUS);
-		
 		if (showProgress)
-		{
 			ApplyTileMap();
-		}
 
-		currentN++;
+
+		// Do stuff on task finish
+		if (taskLastState==false)
+		{
+			taskLastState = generationTask.IsCompleted;
+			if (taskLastState)
+			{
+				ApplyTileMap();
+				EmitSignal(SignalName.OnDone);
+			}
+		}
+	}
+
+
+	// Starts generation task
+	public void GenerateMap(bool clearTarget=true)
+	{
+		taskLastState = false;
+		generationTask = Task.Run(() => {_GenerateMap(clearTarget);});
+	}
+
+
+	// Generates Map
+	private async Task _GenerateMap(bool clearTarget=true)
+	{
+		if (clearTarget) ClearMap();
+		UpdateCountAll();
+
+		while(true)
+		{
+			if (currentN>=maxN)
+			{
+				break;
+			}
+			
+			Vector2I nextTile = GetNextTile(); // Find the next tile to set
+			List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
+			SetTile(nextTile, options[(int)(GD.Randi()%options.Count)]); // Set tile to a random possible option
+			UpdateCountRadius(nextTile, MATCH_RADIUS);
+			
+			currentN++;
+		}
 	}
 	
 	// Applies the tiles array to the target tile map
@@ -111,14 +135,8 @@ public partial class WFCGenerator : Node2D
 					bool anyMatch = false;
 					foreach (Vector2I occurance in usedTiles[usedTile])
 					{
-						if (GetTile(coord+new Vector2I(i,j))==Vector_1)
-						{
+						if (DoTilesMatch(GetTile(coord+new Vector2I(i,j)), sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))))
 							anyMatch = true;
-						}
-						if (sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))==GetTile(coord+new Vector2I(i,j)))
-						{
-							anyMatch = true;
-						}
 					}
 					if (!anyMatch)
 					{
@@ -128,7 +146,6 @@ public partial class WFCGenerator : Node2D
 				}
 			if (f) count++;
 		}
-		GD.Print("done2");
 		return count;
 	}
 	// Returns all possible options for the given tile coordinates
@@ -145,16 +162,8 @@ public partial class WFCGenerator : Node2D
 					bool anyMatch = false;
 					foreach (Vector2I occurance in usedTiles[usedTile])
 					{
-						if (GetTile(coord+new Vector2I(i,j))==Vector_1)
-						{
+						if (DoTilesMatch(GetTile(coord+new Vector2I(i,j)), sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))))
 							anyMatch = true;
-							break;
-						}
-						if (sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))==GetTile(coord+new Vector2I(i,j)))
-						{
-							anyMatch = true;
-							break;
-						}
 					}
 					if (!anyMatch)
 					{
@@ -165,6 +174,19 @@ public partial class WFCGenerator : Node2D
 			if (f) options.Add(usedTile);
 		}
 		return options;
+	}
+
+	// returns true if the two given tiles match (or if one of them is not set)
+	private bool DoTilesMatch(Vector2I tile1, Vector2I tile2)
+	{
+		bool match = false;
+
+		if (tile1==Vector_1)
+			match = true;
+		if (tile2==tile1)
+			match = true;
+
+		return match;
 	}
 	
 	// Returns the tile with the least possible options. 
@@ -221,12 +243,10 @@ public partial class WFCGenerator : Node2D
 					tileMapCount[i,j]=0;
 				else
 				{
-					// tasks.Add(Task.Run(() => {counts.Add(new int[3](i,j,GetOptionsCount(tempCoord))); GD.Print("done");}));
 					tasks.Add(Task<int>.Factory.StartNew(() => {return GetOptionsCount(tempCoord);}));
 					counts.Add(new int[2]);
 					counts[counts.Count-1][0] = i;
 					counts[counts.Count-1][1] = j;
-					// tileMapCount[i,j]=GetOptionsCount(tempCoord);
 				}
 			}
 		Task.WaitAll(tasks.ToArray());
@@ -234,18 +254,6 @@ public partial class WFCGenerator : Node2D
 		{
 			tileMapCount[counts[i][0], counts[i][1]] = tasks[i].Result;
 		}
-		GD.Print("all done");
-	}
-	
-	
-	// Returns true if the specified Vector2 is in the given list NEED OPTIMIVATION,NOT USED!
-	private bool IsInList(Vector2I atlasCoord, Vector2I[] targetList)
-	{
-		foreach (Vector2I v in targetList)
-		{
-			if (v == atlasCoord) return true;
-		}
-		return false;
 	}
 
 	// Set every tileMapArray cell to (-1, -1)
