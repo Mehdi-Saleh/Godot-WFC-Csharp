@@ -18,7 +18,7 @@ public partial class WFCGenerator : Node2D
 	[Export] public bool showProgress = true; // If you know the code works for you disable this as it may impact performance
 	
 	
-	// Holds tile occurances in the sample for future use as rules
+	// Holds tile occurrences in the sample for future use as rules
 	private Dictionary<Vector2I, List<Vector2I>> usedTiles = new Dictionary<Vector2I, List<Vector2I>>();
 	
 	// Holds tiles data for internal use only. DO NOT USED DIRECTLY! Use SetTile() and GetTile() instead
@@ -121,6 +121,66 @@ public partial class WFCGenerator : Node2D
 			usedTiles[atlasCoord].Add(cell);
 		}
 	}
+
+	// Delete repeated rules
+	private void DeleteRepeatedRules()
+	{
+		foreach (List<Vector2I> occurrences in usedTiles)
+			{
+				foreach (Vector2I occurrence in occurrences)
+				{
+					int count = 0;
+					int lastIndex = -1;
+					while(true)
+					{
+						int index = occurrences.FindIndex(lastIndex, (Vector2I val) => val==occurrence);
+						if (index==-1) break;
+
+						lastIndex = index;
+						count++;
+					}
+
+					for (int i=1; i<count; i++)
+						occurrences.Remove(occurrence);
+				}
+			}
+			// for (int k1=0; k1<occurrences.Count; k1++)
+			// 	for (int k2=0; k2<occurrences.Count; k2++)
+			// 	{
+			// 		if (k1==k2) continue;
+			// 		bool doMatch = true;
+			// 		for (int i=-MATCH_RADIUS; i<=MATCH_RADIUS&&doMatch; i++)
+			// 			for (int j=-MATCH_RADIUS; j<=MATCH_RADIUS&&doMatch; j++)
+			// 			{
+			// 				Vector2I tempVector = new Vector2I(i,j);
+			// 				if (
+			// 					!sample.GetCellAtlasCoords(0, occurrences[k1]+tempVector)
+			// 					== sample.GetCellAtlasCoords(0, occurrences[k2]+tempVector)
+			// 					)
+			// 					doMatch = false;
+			// 			}
+					
+			// 		if (!doMatch)
+			// 		{
+			// 			occurrences.Delete(k2);
+			// 			if (k1<k2) k1--;
+			// 			k2--;
+			// 		}
+			//	 }
+			{
+				Vector2I tempCoord = new Vector2I(i,j);
+				if (GetTile(tempCoord)!=Vector_1) 
+					tileMapCount[i,j]=0;
+				else
+				{
+					tasks.Add(Task<int>.Factory.StartNew(() => {return GetOptionsCount(tempCoord);}));
+					counts.Add(new int[2]);
+					counts[counts.Count-1][0] = i;
+					counts[counts.Count-1][1] = j;
+				}
+			}
+	}
+
 	// Returns the number of possible options for the given tile coordinates
 	private int GetOptionsCount(Vector2I coord)
 	{
@@ -133,9 +193,9 @@ public partial class WFCGenerator : Node2D
 				for (j=-MATCH_RADIUS; j<=MATCH_RADIUS&&!b; j++)
 				{
 					bool anyMatch = false;
-					foreach (Vector2I occurance in usedTiles[usedTile])
+					foreach (Vector2I occurrence in usedTiles[usedTile])
 					{
-						if (DoTilesMatch(GetTile(coord+new Vector2I(i,j)), sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))))
+						if (DoTilesMatch(GetTile(coord+new Vector2I(i,j)), sample.GetCellAtlasCoords(0, occurrence+new Vector2I(i,j))))
 							anyMatch = true;
 					}
 					if (!anyMatch)
@@ -160,9 +220,9 @@ public partial class WFCGenerator : Node2D
 				for (j=-MATCH_RADIUS; j<=MATCH_RADIUS&&!b; j++)
 				{
 					bool anyMatch = false;
-					foreach (Vector2I occurance in usedTiles[usedTile])
+					foreach (Vector2I occurrence in usedTiles[usedTile])
 					{
-						if (DoTilesMatch(GetTile(coord+new Vector2I(i,j)), sample.GetCellAtlasCoords(0, occurance+new Vector2I(i,j))))
+						if (DoTilesMatch(GetTile(coord+new Vector2I(i,j)), sample.GetCellAtlasCoords(0, occurrence+new Vector2I(i,j))))
 							anyMatch = true;
 					}
 					if (!anyMatch)
