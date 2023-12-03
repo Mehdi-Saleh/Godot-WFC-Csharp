@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 public partial class WFCGenerator : Node2D
 {
-	private bool done = false;
 	private Vector2I Vector_1 = new Vector2I(-1,-1);
-	[Export] private const int H=50, V=30; // Map size, horizontal and vertical
-	[Export] public const int MATCH_RADIUS = 1; // The radius around a tile check for matching tiles with sample
-	private int maxN; // Total number of tiles which need to be set
-	private int currentN=0; // Number of tiles that are currently set
+
 	[Export] public TileMap target;
 	[Export] public TileMap sample;
+	[Export] private int H=50, V=30; // Map size, horizontal and vertical
+	[Export] public int MATCH_RADIUS = 1; // The radius around a tile check for matching tiles with sample
+	private int maxN; // Total number of tiles which need to be set
+	private int currentN=0; // Number of tiles that are currently set
 
 	[Export] public bool showProgress = true; // If you know the code works for you disable this as it may impact performance
 	
@@ -22,10 +22,11 @@ public partial class WFCGenerator : Node2D
 	private Dictionary<Vector2I, List<Vector2I>> usedTiles = new Dictionary<Vector2I, List<Vector2I>>();
 	
 	// Holds tiles data for internal use only. DO NOT USED DIRECTLY! Use SetTile() and GetTile() instead
-	private Vector2I[,] tileMapArray = new Vector2I[H+MATCH_RADIUS*2,V+MATCH_RADIUS*2]; 
+	private List<List<Vector2I>> tileMapArray; 
 
 	// Holds possible options counts
-	private int[,] tileMapCount = new int[H,V]; 
+	private List<List<int>> tileMapCount;
+	private bool done = false;
 
 	private Task generationTask;
 	private bool taskLastState = true; // true means done
@@ -33,10 +34,26 @@ public partial class WFCGenerator : Node2D
 
 	[Signal] public delegate void OnDoneEventHandler(); // emitted on end of generation
 	
-	
+
 	// Called when the node enters the scene tree for the first time.
 	public override async void _Ready()
 	{
+		tileMapArray = new List<List<Vector2I>>(H+MATCH_RADIUS*2);
+		for (int i=0; i<H+MATCH_RADIUS*2; i++)
+		{
+			tileMapArray.Add(new List<Vector2I>(V+MATCH_RADIUS*2));
+			for (int j=0; j<V+MATCH_RADIUS*2; j++)
+				tileMapArray[i].Add(new Vector2I(-1,-1));
+		}
+
+		tileMapCount = new List<List<int>>(H);
+		for (int i=0; i<H+MATCH_RADIUS*2; i++)
+		{
+			tileMapCount.Add(new List<int>(V));
+			for (int j=0; j<V; j++)
+				tileMapCount[i].Add(-1);
+		}
+
 		sample.Hide();
 		maxN = H*V;
 		Init(); // Needs to be called to initialize usedTiles (to create rules)
@@ -120,30 +137,32 @@ public partial class WFCGenerator : Node2D
 			}
 			usedTiles[atlasCoord].Add(cell);
 		}
+		// DeleteRepeatedRules();
+		GD.Print(usedTiles[new Vector2I(0,0)].Count);
 	}
 
 	// Delete repeated rules
 	private void DeleteRepeatedRules()
 	{
-		foreach (List<Vector2I> occurrences in usedTiles)
+		foreach (Vector2I occIndex in usedTiles.Keys)
+		{
+			foreach (Vector2I occurrence in usedTiles[occIndex])
 			{
-				foreach (Vector2I occurrence in occurrences)
+				int count = 0;
+				int lastIndex = -1;
+				while(true)
 				{
-					int count = 0;
-					int lastIndex = -1;
-					while(true)
-					{
-						int index = occurrences.FindIndex(lastIndex, (Vector2I val) => val==occurrence);
-						if (index==-1) break;
+					int index = usedTiles[occIndex].FindIndex(lastIndex, (Vector2I val) => val==occurrence);
+					if (index==-1) break;
 
-						lastIndex = index;
-						count++;
-					}
-
-					for (int i=1; i<count; i++)
-						occurrences.Remove(occurrence);
+					lastIndex = index;
+					count++;
 				}
+
+				for (int i=1; i<count; i++)
+					usedTiles[occIndex].Remove(occurrence);
 			}
+		}
 			// for (int k1=0; k1<occurrences.Count; k1++)
 			// 	for (int k2=0; k2<occurrences.Count; k2++)
 			// 	{
@@ -167,18 +186,18 @@ public partial class WFCGenerator : Node2D
 			// 			k2--;
 			// 		}
 			//	 }
-			{
-				Vector2I tempCoord = new Vector2I(i,j);
-				if (GetTile(tempCoord)!=Vector_1) 
-					tileMapCount[i,j]=0;
-				else
-				{
-					tasks.Add(Task<int>.Factory.StartNew(() => {return GetOptionsCount(tempCoord);}));
-					counts.Add(new int[2]);
-					counts[counts.Count-1][0] = i;
-					counts[counts.Count-1][1] = j;
-				}
-			}
+			// {
+			// 	Vector2I tempCoord = new Vector2I(i,j);
+			// 	if (GetTile(tempCoord)!=Vector_1) 
+			// 		tileMapCount[i][j]=0;
+			// 	else
+			// 	{
+			// 		tasks.Add(Task<int>.Factory.StartNew(() => {return GetOptionsCount(tempCoord);}));
+			// 		counts.Add(new int[2]);
+			// 		counts[counts.Count-1][0] = i;
+			// 		counts[counts.Count-1][1] = j;
+			// 	}
+			// }
 	}
 
 	// Returns the number of possible options for the given tile coordinates
@@ -257,9 +276,9 @@ public partial class WFCGenerator : Node2D
 		for (int i=0; i<H; i++)
 			for (int j=0; j<V; j++)
 			{
-				if (tileMapCount[i,j]<leastOptions && tileMapCount[i,j]>0)
+				if (tileMapCount[i][j]<leastOptions && tileMapCount[i][j]>0)
 				{
-					leastOptions = tileMapCount[i,j];
+					leastOptions = tileMapCount[i][j];
 					bestTile[0] = i;
 					bestTile[1] = j;
 				}
@@ -276,9 +295,9 @@ public partial class WFCGenerator : Node2D
 			{
 				Vector2I coord = new Vector2I(i,j);
 				if (GetTile(coord)!=Vector_1) 
-					tileMapCount[i,j]=0;
+					tileMapCount[i][j]=0;
 				else
-					tileMapCount[i,j] = GetOptionsCount(coord);
+					tileMapCount[i][j] = GetOptionsCount(coord);
 			}
 	}
 
@@ -300,7 +319,7 @@ public partial class WFCGenerator : Node2D
 				}
 				Vector2I tempCoord = new Vector2I(i,j);
 				if (GetTile(tempCoord)!=Vector_1) 
-					tileMapCount[i,j]=0;
+					tileMapCount[i][j]=0;
 				else
 				{
 					tasks.Add(Task<int>.Factory.StartNew(() => {return GetOptionsCount(tempCoord);}));
@@ -312,7 +331,7 @@ public partial class WFCGenerator : Node2D
 		Task.WaitAll(tasks.ToArray());
 		for (int i=0; i<tasks.Count; i++)
 		{
-			tileMapCount[counts[i][0], counts[i][1]] = tasks[i].Result;
+			tileMapCount[counts[i][0]][counts[i][1]] = tasks[i].Result;
 		}
 	}
 
@@ -322,14 +341,14 @@ public partial class WFCGenerator : Node2D
 		for (int i=0; i<H+MATCH_RADIUS*2; i++)
 			for (int j=0; j<V+MATCH_RADIUS*2; j++)
 			{
-				tileMapArray[i,j] = Vector_1;
+				tileMapArray[i][j] = Vector_1;
 			}
 	}
 
 	// Get tile from tileMapArray using coordinates
 	private Vector2I GetTile(int coordX, int coordY)
 	{
-		return tileMapArray[coordX+MATCH_RADIUS, coordY+MATCH_RADIUS];
+		return tileMapArray[coordX+MATCH_RADIUS][coordY+MATCH_RADIUS];
 	}
 	// Get tile from tileMapArray using coordinates
 	private Vector2I GetTile(Vector2I coord)
@@ -340,7 +359,7 @@ public partial class WFCGenerator : Node2D
 	// Set tile on tileMapArray using coordinates
 	private void SetTile(int coordX, int coordY, Vector2I value)
 	{
-		tileMapArray[coordX+MATCH_RADIUS, coordY+MATCH_RADIUS] = value;
+		tileMapArray[coordX+MATCH_RADIUS][coordY+MATCH_RADIUS] = value;
 	}
 	// Set tile on tileMapArray using coordinates
 	private void SetTile(Vector2I coord, Vector2I value)
