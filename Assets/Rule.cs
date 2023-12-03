@@ -16,4 +16,6 @@ public partial class Rule : Node
                 ruleArray[i].Add(new Vector2I(-1,-1));
         }
     }
+
+    // public static Rule CreateRule()
 }
