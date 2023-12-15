@@ -1,6 +1,6 @@
 # Godot-WFC-Csharp
 
-![[./Screenshots/screenshot1.png]]
+![ScreenShot](./Screenshots/screenshot1.png)
 
 This is a wave function collapse inplementation for godot in C#.
 
