@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,6 +39,27 @@ public partial class WFCGenerator : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override async void _Ready()
 	{
+		Vector2I[,] arr1 = new Vector2I[3,3];
+		Vector2I[,] arr2 = new Vector2I[3,3];
+
+		for (int i=0; i<3; i++)
+			for (int j=0; j<3; j++)
+			{
+				arr1[i,j] = new Vector2I(0,0);
+				arr2[i,j] = new Vector2I(0,0);
+			}
+		arr2[0,0] = Vector_1;
+		arr2[0,0] = Vector2I.Left;
+
+		Rule r1 = new Rule(MATCH_RADIUS, arr1);
+		Rule r2 = new Rule(MATCH_RADIUS, arr2);
+
+		GD.Print(r1.CompareWith(r2));
+		GD.Print(r1.CompareWithTiles(arr1));
+		GD.Print(r1.CompareWithTiles(arr2));
+
+
+
 		tileMapArray = new List<List<Vector2I>>(H + MATCH_RADIUS * 2);
 		for (int i = 0; i < H + MATCH_RADIUS * 2; i++)
 		{

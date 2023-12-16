@@ -55,10 +55,39 @@ public partial class Rule : Node
         return arr;
     }
 
+    // returns true if all tiles have non-negative values
+    public bool IsValid()
+    {
+        for (int i=0; i<ruleArray.Count; i++)
+            for (int j=0; j<ruleArray.Count; j++)
+                if (ruleArray[i][j][0]<0 || ruleArray[i][j][2]<0)
+                    return false;
+        return true;
+    }
+
     // returns true if the two rules are identic
     public bool CompareWith(Rule rule)
     {
         return CompareRules(this, rule);
+    }
+
+    // returns true if this rule is suitablble to be appiled on the set of given tiles
+    public bool CompareWithTiles(Vector2I[,] tilesArray)
+    {
+        if (tilesArray.GetLength(0)!=ruleArray.Count
+        || tilesArray.GetLength(1)!=ruleArray.Count)
+            return false;
+
+
+        Vector2I V_1 = new Vector2I(-1,-1);
+        for (int i=0; i<ruleArray.Count; i++)
+            for (int j=0; j<ruleArray.Count; j++)
+            {
+                if (tilesArray[i,j]!=V_1 && tilesArray[i,j]!=ruleArray[i][j])
+                    return false;
+            }
+        
+        return true;
     }
 
     // returns true if the two rules are identic
