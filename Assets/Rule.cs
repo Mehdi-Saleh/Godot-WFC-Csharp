@@ -106,4 +106,20 @@ public partial class Rule : Node
 
         return true;
     }
+
+    // print the rule in console, for debugging purposes
+    public void Print()
+    {
+        GD.Print("{");
+        for (int i=0; i<ruleArray.Count; i++)
+        {
+            string s="";
+            for (int j=0; j<ruleArray.Count; j++)
+            {
+                s += ruleArray[j][i].ToString()+",";
+            }
+            GD.Print(s);
+        }
+        GD.Print("}");
+    }
 }
