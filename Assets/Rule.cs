@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 public partial class Rule : Node
 {
-    protected List<List<Vector2I>> ruleArray;
+    public List<List<Vector2I>> RuleArray {get; private set;}
     protected static Vector2I Vector_1 = new Vector2I(-1, -1);
 
     public Rule(int matchRadius)
@@ -19,10 +19,10 @@ public partial class Rule : Node
     public Rule(int matchRadius, Vector2I[,] suroundings)
     {
         CreateRuleArray(matchRadius);
-        for (int i=0; i<ruleArray.Count; i++)
-            for (int j=0; j<ruleArray.Count; j++)
+        for (int i=0; i<RuleArray.Count; i++)
+            for (int j=0; j<RuleArray.Count; j++)
             {
-                ruleArray[i][j] = suroundings[i,j];
+                RuleArray[i][j] = suroundings[i,j];
             }
     }
 
@@ -30,10 +30,10 @@ public partial class Rule : Node
     {
         Vector2I matchRadVector = new Vector2I(matchRadius, matchRadius);
         CreateRuleArray(matchRadius);
-        for (int i=0; i<ruleArray.Count; i++)
-            for (int j=0; j<ruleArray.Count; j++)
+        for (int i=0; i<RuleArray.Count; i++)
+            for (int j=0; j<RuleArray.Count; j++)
             {
-                ruleArray[i][j] = sample.GetCellAtlasCoords(0, position-matchRadVector+new Vector2I(i,j));
+                RuleArray[i][j] = sample.GetCellAtlasCoords(0, position-matchRadVector+new Vector2I(i,j));
             }
     }
     
@@ -41,56 +41,46 @@ public partial class Rule : Node
     {
         Vector2I matchRadVector = new Vector2I(matchRadius, matchRadius);
         CreateRuleArray(matchRadius);
-        for (int i=0; i<ruleArray.Count; i++)
-            for (int j=0; j<ruleArray.Count; j++)
+        for (int i=0; i<RuleArray.Count; i++)
+            for (int j=0; j<RuleArray.Count; j++)
             {
                 if (offsetPos)
-                    ruleArray[i][j] = tilesArray[position.X+i][position.Y+j];
+                    RuleArray[i][j] = tilesArray[position.X+i][position.Y+j];
                 else
-                    ruleArray[i][j] = tilesArray[position.X-matchRadius+i][position.Y-matchRadius+j];
+                    RuleArray[i][j] = tilesArray[position.X-matchRadius+i][position.Y-matchRadius+j];
             }
     }
 
 
-    // creates a new ruleArray
+    // creates a new RuleArray
     protected void CreateRuleArray(int matchRadius)
     {
-        ruleArray = new List<List<Vector2I>>(1+matchRadius*2);
+        RuleArray = new List<List<Vector2I>>(1+matchRadius*2);
         for (int i=0; i<1+matchRadius*2; i++)
         {
-            ruleArray.Add(new List<Vector2I>(1+matchRadius*2));
+            RuleArray.Add(new List<Vector2I>(1+matchRadius*2));
             for (int j=0; j<1+matchRadius*2; j++)
-                ruleArray[i].Add(new Vector2I(-1,-1));
+                RuleArray[i].Add(new Vector2I(-1,-1));
         }
     }
 
 
-    // returns match radios based on current ruleArray size
+    // returns match radios based on current RuleArray size
     public int GetMatchRadius()
     {
-        return (ruleArray.Count-1)/2;
+        return (RuleArray.Count-1)/2;
     }
 
     // returns this rule in the shape of an array
     public Vector2I[,] GetArray()
     {
-        Vector2I[,] arr = new Vector2I[ruleArray.Count, ruleArray.Count];
+        Vector2I[,] arr = new Vector2I[RuleArray.Count, RuleArray.Count];
         for (int i=0; i<arr.GetLength(0); i++)
             for (int j=0; j<arr.GetLength(1); j++)
             {
-                arr[i,j] = ruleArray[i][j];
+                arr[i,j] = RuleArray[i][j];
             }
         return arr;
-    }
-
-    // returns true if all tiles have non-negative values
-    public bool IsValid()
-    {
-        for (int i=0; i<ruleArray.Count; i++)
-            for (int j=0; j<ruleArray.Count; j++)
-                if (ruleArray[i][j].X<0 || ruleArray[i][j].Y<0)
-                    return false;
-        return true;
     }
 
     // returns true if the two rules are identic
@@ -102,16 +92,16 @@ public partial class Rule : Node
     // returns true if this rule is suitablble to be appiled on the set of given tiles
     public bool CompareWithTiles(Vector2I[,] tilesArray)
     {
-        if (tilesArray.GetLength(0)!=ruleArray.Count
-        || tilesArray.GetLength(1)!=ruleArray.Count)
+        if (tilesArray.GetLength(0)!=RuleArray.Count
+        || tilesArray.GetLength(1)!=RuleArray.Count)
             return false;
 
 
         Vector2I V_1 = new Vector2I(-1,-1);
-        for (int i=0; i<ruleArray.Count; i++)
-            for (int j=0; j<ruleArray.Count; j++)
+        for (int i=0; i<RuleArray.Count; i++)
+            for (int j=0; j<RuleArray.Count; j++)
             {
-                if (tilesArray[i,j]!=V_1 && tilesArray[i,j]!=ruleArray[i][j])
+                if (tilesArray[i,j]!=V_1 && tilesArray[i,j]!=RuleArray[i][j])
                     return false;
             }
         
@@ -121,15 +111,15 @@ public partial class Rule : Node
     // returns true if the two rules are identic
     public static bool CompareRules(Rule rule1, Rule rule2, bool ignore_1InRule2 = false)
     {
-        int ruleArraySize = rule1.ruleArray.Count;
-        if (ruleArraySize != rule2.ruleArray.Count)
+        int RuleArraySize = rule1.RuleArray.Count;
+        if (RuleArraySize != rule2.RuleArray.Count)
             return false;
         if (!ignore_1InRule2)
         {   
-            for (int i=0; i<ruleArraySize; i++)
-                for (int j=0; j<ruleArraySize; j++)
+            for (int i=0; i<RuleArraySize; i++)
+                for (int j=0; j<RuleArraySize; j++)
                 {
-                    if (rule1.ruleArray[i][j] != rule2.ruleArray[i][j])
+                    if (rule1.RuleArray[i][j] != rule2.RuleArray[i][j])
                         return false;
                 }
 
@@ -138,10 +128,10 @@ public partial class Rule : Node
         else
         {
 
-            for (int i=0; i<ruleArraySize; i++)
-                for (int j=0; j<ruleArraySize; j++)
+            for (int i=0; i<RuleArraySize; i++)
+                for (int j=0; j<RuleArraySize; j++)
                 {
-                    if (!DoTilesMatch(rule2.ruleArray[i][j], rule1.ruleArray[i][j]))
+                    if (!DoTilesMatch(rule2.RuleArray[i][j], rule1.RuleArray[i][j]))
                         return false;
                 }
 
@@ -153,13 +143,6 @@ public partial class Rule : Node
     // returns true if the two given tiles match (or if the first one is not set)
 	private static bool DoTilesMatch(Vector2I tile1, Vector2I tile2)
 	{
-		// bool match = false;
-
-		// if (tile1 == Vector_1)
-		// 	match = true;
-		// if (tile2 == tile1)
-		// 	match = true;
-
 		return tile1==Vector_1 || tile2==tile1;
 	}
 
@@ -167,12 +150,12 @@ public partial class Rule : Node
     public void Print()
     {
         GD.Print("{");
-        for (int i=0; i<ruleArray.Count; i++)
+        for (int i=0; i<RuleArray.Count; i++)
         {
             string s="";
-            for (int j=0; j<ruleArray.Count; j++)
+            for (int j=0; j<RuleArray.Count; j++)
             {
-                s += ruleArray[j][i].ToString()+",";
+                s += RuleArray[j][i].ToString()+",";
             }
             GD.Print(s);
         }

@@ -159,25 +159,15 @@ public partial class WFCGenerator : Node2D
 		Godot.Collections.Array<Vector2I> usedCells = sample.GetUsedCells(0);
 		foreach (Vector2I cell in usedCells)
 		{
-			// Vector2I atlasCoord = sample.GetCellAtlasCoords(0, cell);
-			// if (!usedTiles.ContainsKey(atlasCoord))
-			// {
-			// 	usedTiles.Add(atlasCoord, new List<Vector2I>());
-			// }
-			// usedTiles[atlasCoord].Add(cell);
-
 			Vector2I atlasCoord = sample.GetCellAtlasCoords(0, cell);
 			if (!usedRules.ContainsKey(atlasCoord))
 			{
 				usedRules.Add(atlasCoord, new List<Rule>());
 			}
 			Rule rule = new Rule(MATCH_RADIUS, cell, in sample);
-			if (rule.IsValid())
-				usedRules[atlasCoord].Add(rule);
+			usedRules[atlasCoord].Add(rule);
 		}
 		// DeleteRepeatedRules();
-		// GD.Print(usedTiles[new Vector2I(0, 0)].Count);
-		// GD.Print(usedRules[new Vector2I(0, 0)].Count);
 	}
 
 	// Delete repeated rules
@@ -243,47 +233,31 @@ public partial class WFCGenerator : Node2D
 	private int GetOptionsCount(Vector2I coord)
 	{
 		int count = 0;
-		// foreach (Vector2I usedTile in usedTiles.Keys)
 		foreach (Vector2I atlasCoord in usedRules.Keys)
 		{
 			bool f = true;
-			// bool b = false;
-			// int i, j;
-			// for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
-			// 	for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
-			// 	{
-			// 		bool anyMatch = false;
-			// 		foreach (Vector2I occurrence in usedTiles[usedTile])
-			// 		{
-			// 			if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), sample.GetCellAtlasCoords(0, occurrence + new Vector2I(i, j))))
-			// 				anyMatch = true;
-			// 		}
-			// 		if (!anyMatch)
-			// 		{
-			// 			f = false;
-			// 			b = true;
-			// 		}
-			// 	}
-			// if (f) count++;
-
-			bool anyMatch = false;
-			foreach (Rule rule in usedRules[atlasCoord])
-			{
-				if (rule.CompareWith(new Rule(MATCH_RADIUS, coord, in tileMapArray), true))
+			bool b = false;
+			int i, j;
+			for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
+				for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
 				{
-					anyMatch = true;
-					break;
+					bool anyMatch = false;
+					foreach (Rule rule in usedRules[atlasCoord])
+					{
+						if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), rule.RuleArray[MATCH_RADIUS+i][MATCH_RADIUS+j]))
+							anyMatch = true;
+					}
+					if (!anyMatch)
+					{
+						f = false;
+						b = true;
+					}
 				}
-			}
-			if (!anyMatch)
-			{
-				f = false;
-			}
 			if (f) count++;
 		}
-		// GD.Print(count);
 		return count;
 	}
+
 	// Returns all possible options for the given tile coordinates
 	private List<Vector2I> GetOptions(Vector2I coord)
 	{
@@ -291,36 +265,24 @@ public partial class WFCGenerator : Node2D
 		foreach (Vector2I atlasCoord in usedRules.Keys)
 		{
 			bool f = true;
-			// bool f = true, b = false;
-			// int i = 0, j = 0;
-			// for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
-			// 	for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
-			// 	{
-			// 		bool anyMatch = false;
-			// 		foreach (Vector2I occurrence in usedTiles[usedTile])
-			// 		{
-			// 			if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), sample.GetCellAtlasCoords(0, occurrence + new Vector2I(i, j))))
-			// 				anyMatch = true;
-			// 		}
-			// 		if (!anyMatch)
-			// 		{
-			// 			f = false;
-			// 			b = true;
-			// 		}
-			// 	}
-			bool anyMatch = false;
-			foreach (Rule rule in usedRules[atlasCoord])
-			{
-				if (rule.CompareWith(new Rule(MATCH_RADIUS, coord, tileMapArray), true))
+			bool b = false;
+			int i = 0, j = 0;
+			for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
+				for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
 				{
-					anyMatch = true;
-					break;
+					bool anyMatch = false;
+					foreach (Rule rule in usedRules[atlasCoord])
+					{
+						if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), rule.RuleArray[MATCH_RADIUS+i][MATCH_RADIUS+j]))
+							anyMatch = true;
+					}
+					if (!anyMatch)
+					{
+						f = false;
+						b = true;
+					}
 				}
-			}
-			if (!anyMatch)
-			{
-				f = false;
-			}
+		
 			if (f) options.Add(atlasCoord);
 		}
 		return options;
