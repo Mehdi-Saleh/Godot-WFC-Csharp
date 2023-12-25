@@ -2,6 +2,7 @@ using Godot;
 using Godot.NativeInterop;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 
@@ -87,7 +88,7 @@ public partial class Rule : Node
     {
         for (int i=0; i<ruleArray.Count; i++)
             for (int j=0; j<ruleArray.Count; j++)
-                if (ruleArray[i][j][0]<0 || ruleArray[i][j][2]<0)
+                if (ruleArray[i][j].X<0 || ruleArray[i][j].Y<0)
                     return false;
         return true;
     }
@@ -152,14 +153,14 @@ public partial class Rule : Node
     // returns true if the two given tiles match (or if the first one is not set)
 	private static bool DoTilesMatch(Vector2I tile1, Vector2I tile2)
 	{
-		bool match = false;
+		// bool match = false;
 
-		if (tile1 == Vector_1)
-			match = true;
-		if (tile2 == tile1)
-			match = true;
+		// if (tile1 == Vector_1)
+		// 	match = true;
+		// if (tile2 == tile1)
+		// 	match = true;
 
-		return match;
+		return tile1==Vector_1 || tile2==tile1;
 	}
 
     // print the rule in console, for debugging purposes

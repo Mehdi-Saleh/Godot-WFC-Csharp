@@ -132,8 +132,10 @@ public partial class WFCGenerator : Node2D
 
 			Vector2I nextTile = GetNextTile(); // Find the next tile to set
 			List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
+			GD.Print(options.Count);
 			SetTile(nextTile, options[(int)(GD.Randi() % options.Count)]); // Set tile to a random possible option
 			UpdateCountRadius(nextTile, MATCH_RADIUS);
+			// UpdateCountAll();
 
 			currentN++;
 		}
@@ -169,7 +171,9 @@ public partial class WFCGenerator : Node2D
 			{
 				usedRules.Add(atlasCoord, new List<Rule>());
 			}
-			usedRules[atlasCoord].Add(new Rule(MATCH_RADIUS, cell, in sample));
+			Rule rule = new Rule(MATCH_RADIUS, cell, in sample);
+			if (rule.IsValid())
+				usedRules[atlasCoord].Add(rule);
 		}
 		// DeleteRepeatedRules();
 		// GD.Print(usedTiles[new Vector2I(0, 0)].Count);
@@ -265,7 +269,7 @@ public partial class WFCGenerator : Node2D
 			bool anyMatch = false;
 			foreach (Rule rule in usedRules[atlasCoord])
 			{
-				if (rule.CompareWith(new Rule(MATCH_RADIUS, coord, tileMapArray), true))
+				if (rule.CompareWith(new Rule(MATCH_RADIUS, coord, in tileMapArray), true))
 				{
 					anyMatch = true;
 					break;
@@ -277,7 +281,7 @@ public partial class WFCGenerator : Node2D
 			}
 			if (f) count++;
 		}
-		GD.Print(count);
+		// GD.Print(count);
 		return count;
 	}
 	// Returns all possible options for the given tile coordinates
@@ -346,10 +350,11 @@ public partial class WFCGenerator : Node2D
 				if (tileMapCount[i][j] < leastOptions && tileMapCount[i][j] > 0)
 				{
 					leastOptions = tileMapCount[i][j];
-					bestTile[0] = i;
-					bestTile[1] = j;
+					bestTile.X = i;
+					bestTile.Y = j;
 				}
 			}
+		GD.Print(leastOptions);
 		return bestTile;
 	}
 
