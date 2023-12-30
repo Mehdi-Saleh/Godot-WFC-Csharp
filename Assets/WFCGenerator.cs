@@ -13,6 +13,8 @@ public partial class WFCGenerator : Node2D
 	[Export] public TileMap sample;
 	[Export] private int H = 50, V = 30; // Map size, horizontal and vertical
 	[Export] public int MATCH_RADIUS = 1; // The radius around a tile check for matching tiles with sample
+	[Export] public GenerationType generationType = GenerationType.Intelligent;
+	[Export] public bool chooseByProbablity = false;
 	public int maxN; // Total number of tiles which need to be set
 	public int currentN = 0; // Number of tiles that are currently set
 
@@ -20,8 +22,9 @@ public partial class WFCGenerator : Node2D
 
 
 	// Holds tile occurrences in the sample for future use as rules
-	// private Dictionary<Vector2I, List<Vector2I>> usedTiles = new Dictionary<Vector2I, List<Vector2I>>();
 	private Dictionary<Vector2I, List<Rule>> usedRules = new Dictionary<Vector2I, List<Rule>>();
+	// Holds number of repeatitions of each option. Used for calculating occurance probablity
+	private Dictionary<Vector2I, int> tilesRepeatitions = new Dictionary<Vector2I, int>();
 
 	// Holds tiles data for internal use only. DO NOT USED DIRECTLY! Use SetTile() and GetTile() instead
 	private List<List<Vector2I>> tileMapArray;
@@ -40,29 +43,6 @@ public partial class WFCGenerator : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override async void _Ready()
 	{
-		// Vector2I[,] arr1 = new Vector2I[3,3];
-		// Vector2I[,] arr2 = new Vector2I[3,3];
-
-		// for (int i=0; i<3; i++)
-		// 	for (int j=0; j<3; j++)
-		// 	{
-		// 		arr1[i,j] = new Vector2I(0,0);
-		// 		arr2[i,j] = new Vector2I(0,0);
-		// 	}
-		// arr2[0,0] = Vector_1;
-		// arr2[0,1] = Vector2I.Left;
-
-		// Rule r1 = new Rule(MATCH_RADIUS, arr1);
-		// Rule r2 = new Rule(MATCH_RADIUS, arr2);
-
-		// r1.Print();
-		// r2.Print();
-		// GD.Print(r1.CompareWith(r2));
-		// GD.Print(r1.CompareWithTiles(arr1));
-		// GD.Print(r1.CompareWithTiles(arr2));
-
-
-
 		tileMapArray = new List<List<Vector2I>>(H + MATCH_RADIUS * 2);
 		for (int i = 0; i < H + MATCH_RADIUS * 2; i++)
 		{
@@ -112,13 +92,14 @@ public partial class WFCGenerator : Node2D
 	public void GenerateMap(bool clearTarget = true)
 	{
 		taskLastState = false;
-		generationTask = Task.Run(() => { _GenerateMap(clearTarget); });
-	}
+        generationTask = Task.Run(() => { _GenerateMap(clearTarget); });
+    }
 
 
-	// Generates Map
-	private async Task _GenerateMap(bool clearTarget = true)
-	{
+
+    // Generates Map
+    private void _GenerateMap(bool clearTarget = true)
+    {
 		if (clearTarget) 
 			ClearMap();
 		UpdateCountAll();
@@ -132,10 +113,11 @@ public partial class WFCGenerator : Node2D
 
 			Vector2I nextTile = GetNextTile(); // Find the next tile to set
 			List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
-			GD.Print(options.Count);
-			SetTile(nextTile, options[(int)(GD.Randi() % options.Count)]); // Set tile to a random possible option
+			if (chooseByProbablity)
+				SetTile(nextTile, ChooseOption(options)); // Set tile to a random possible option
+			else
+				SetTile(nextTile, options[(int)(GD.Randi() % options.Count)]); // Set tile to a random possible option
 			UpdateCountRadius(nextTile, MATCH_RADIUS);
-			// UpdateCountAll();
 
 			currentN++;
 		}
@@ -151,83 +133,40 @@ public partial class WFCGenerator : Node2D
 			}
 	}
 
-	// Analyses sample for rules. Must be called once before on ready
+	// Analyses sample for rules. Must be called once before _ready
 	public void Init()
 	{
-		// usedTiles.Clear();
 		usedRules.Clear();
 		Godot.Collections.Array<Vector2I> usedCells = sample.GetUsedCells(0);
 		foreach (Vector2I cell in usedCells)
 		{
+			// generate rule
 			Vector2I atlasCoord = sample.GetCellAtlasCoords(0, cell);
 			if (!usedRules.ContainsKey(atlasCoord))
 			{
 				usedRules.Add(atlasCoord, new List<Rule>());
 			}
+
 			Rule rule = new Rule(MATCH_RADIUS, cell, in sample);
-			usedRules[atlasCoord].Add(rule);
+
+			bool repeated = false;
+			foreach (Rule r in usedRules[atlasCoord])
+				if (r.CompareWith(rule))
+				{
+					repeated = true;
+					break;
+				}
+			if (!repeated)
+				usedRules[atlasCoord].Add(rule);
+
+			// add to tilesRepeatitions
+			if (!tilesRepeatitions.ContainsKey(atlasCoord))
+			{
+				tilesRepeatitions.Add(atlasCoord, 0);
+			}
+			tilesRepeatitions[atlasCoord]++;
 		}
-		// DeleteRepeatedRules();
 	}
-
-	// Delete repeated rules
-	// private void DeleteRepeatedRules()
-	// {
-	// 	foreach (Vector2I occIndex in usedTiles.Keys)
-	// 	{
-	// 		foreach (Vector2I occurrence in usedTiles[occIndex])
-	// 		{
-	// 			int count = 0;
-	// 			int lastIndex = -1;
-	// 			while (true)
-	// 			{
-	// 				int index = usedTiles[occIndex].FindIndex(lastIndex, (Vector2I val) => val == occurrence);
-	// 				if (index == -1) break;
-
-	// 				lastIndex = index;
-	// 				count++;
-	// 			}
-
-	// 			for (int i = 1; i < count; i++)
-	// 				usedTiles[occIndex].Remove(occurrence);
-	// 		}
-	// 	}
-	// 	// for (int k1=0; k1<occurrences.Count; k1++)
-	// 	// 	for (int k2=0; k2<occurrences.Count; k2++)
-	// 	// 	{
-	// 	// 		if (k1==k2) continue;
-	// 	// 		bool doMatch = true;
-	// 	// 		for (int i=-MATCH_RADIUS; i<=MATCH_RADIUS&&doMatch; i++)
-	// 	// 			for (int j=-MATCH_RADIUS; j<=MATCH_RADIUS&&doMatch; j++)
-	// 	// 			{
-	// 	// 				Vector2I tempVector = new Vector2I(i,j);
-	// 	// 				if (
-	// 	// 					!sample.GetCellAtlasCoords(0, occurrences[k1]+tempVector)
-	// 	// 					== sample.GetCellAtlasCoords(0, occurrences[k2]+tempVector)
-	// 	// 					)
-	// 	// 					doMatch = false;
-	// 	// 			}
-
-	// 	// 		if (!doMatch)
-	// 	// 		{
-	// 	// 			occurrences.Delete(k2);
-	// 	// 			if (k1<k2) k1--;
-	// 	// 			k2--;
-	// 	// 		}
-	// 	//	 }
-	// 	// {
-	// 	// 	Vector2I tempCoord = new Vector2I(i,j);
-	// 	// 	if (GetTile(tempCoord)!=Vector_1) 
-	// 	// 		tileMapCount[i][j]=0;
-	// 	// 	else
-	// 	// 	{
-	// 	// 		tasks.Add(Task<int>.Factory.StartNew(() => {return GetOptionsCount(tempCoord);}));
-	// 	// 		counts.Add(new int[2]);
-	// 	// 		counts[counts.Count-1][0] = i;
-	// 	// 		counts[counts.Count-1][1] = j;
-	// 	// 	}
-	// 	// }
-	// }
 
 	// Returns the number of possible options for the given tile coordinates
 	private int GetOptionsCount(Vector2I coord)
@@ -238,21 +177,39 @@ public partial class WFCGenerator : Node2D
 			bool f = true;
 			bool b = false;
 			int i, j;
-			for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
-				for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
-				{
-					bool anyMatch = false;
-					foreach (Rule rule in usedRules[atlasCoord])
+			// if (generationType==GenerationType.Intelligent)
+			{
+				for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
+					for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
 					{
-						if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), rule.RuleArray[MATCH_RADIUS+i][MATCH_RADIUS+j]))
-							anyMatch = true;
+						bool anyMatch = false;
+						foreach (Rule rule in usedRules[atlasCoord])
+						{
+							if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), rule.RuleArray[MATCH_RADIUS+i][MATCH_RADIUS+j]))
+								anyMatch = true;
+						}
+						if (!anyMatch)
+						{
+							f = false;
+							b = true;
+						}
 					}
-					if (!anyMatch)
-					{
-						f = false;
-						b = true;
-					}
-				}
+			}
+			// else if (generationType==GenerationType.Exact)
+			// {
+			// 	Rule rCoord = new Rule(MATCH_RADIUS, coord, sample);
+			// 	bool anyMatch = false;
+			// 	foreach (Rule rule in usedRules[atlasCoord])
+			// 	{
+			// 		if (rule.CompareWith(rCoord, true))
+			// 			anyMatch = true;
+			// 	}
+			// 	if (!anyMatch)
+			// 	{
+			// 		f = false;
+			// 		b = true;
+			// 	}
+			// }
 			if (f) count++;
 		}
 		return count;
@@ -267,25 +224,66 @@ public partial class WFCGenerator : Node2D
 			bool f = true;
 			bool b = false;
 			int i = 0, j = 0;
-			for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
-				for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
-				{
-					bool anyMatch = false;
-					foreach (Rule rule in usedRules[atlasCoord])
+			// if (generationType==GenerationType.Intelligent)
+			{
+				for (i = -MATCH_RADIUS; i <= MATCH_RADIUS && !b; i++)
+					for (j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++)
 					{
-						if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), rule.RuleArray[MATCH_RADIUS+i][MATCH_RADIUS+j]))
-							anyMatch = true;
+						bool anyMatch = false;
+						foreach (Rule rule in usedRules[atlasCoord])
+						{
+							if (DoTilesMatch(GetTile(coord + new Vector2I(i, j)), rule.RuleArray[MATCH_RADIUS+i][MATCH_RADIUS+j]))
+								anyMatch = true;
+						}
+						if (!anyMatch)
+						{
+							f = false;
+							b = true;
+						}
 					}
-					if (!anyMatch)
-					{
-						f = false;
-						b = true;
-					}
-				}
-		
+			}
+			// else if (generationType==GenerationType.Exact)
+			// {
+			// 	Rule rCoord = new Rule(MATCH_RADIUS, coord, sample);
+			// 	bool anyMatch = false;
+			// 	foreach (Rule rule in usedRules[atlasCoord])
+			// 	{
+			// 		if (rule.CompareWith(rCoord, true))
+			// 			anyMatch = true;
+			// 	}
+			// 	if (!anyMatch)
+			// 	{
+			// 		f = false;
+			// 		b = true;
+			// 	}
+			// }
 			if (f) options.Add(atlasCoord);
 		}
 		return options;
+	}
+
+	// chooses a tile from the given options based on its occurance probablity
+	private Vector2I ChooseOption(in List<Vector2I> options)
+	{
+		if (options.Count==0)
+			return Vector_1;
+		
+		int sum = 0;
+		foreach (Vector2I option in options)
+		{
+			sum += tilesRepeatitions[option];
+		}
+
+		int temp = 0;
+		int rand = (int) GD.Randi() % sum;
+		foreach (Vector2I option in options)
+		{
+			temp += tilesRepeatitions[option];
+			if (temp>=rand)
+				return option;
+		}
+
+		return Vector_1;
 	}
 
 	// returns true if the two given tiles match (or if one of them is not set)
@@ -316,7 +314,7 @@ public partial class WFCGenerator : Node2D
 					bestTile.Y = j;
 				}
 			}
-		GD.Print(leastOptions);
+		// GD.Print(leastOptions);
 		return bestTile;
 	}
 
@@ -430,5 +428,11 @@ public partial class WFCGenerator : Node2D
 		ClearMap();
 		UpdateCountAll();
 		GenerateMap();
+	}
+
+	public enum GenerationType
+	{
+		// Exact,
+		Intelligent
 	}
 }

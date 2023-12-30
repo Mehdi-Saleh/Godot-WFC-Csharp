@@ -127,7 +127,6 @@ public partial class Rule : Node
         }
         else
         {
-
             for (int i=0; i<RuleArraySize; i++)
                 for (int j=0; j<RuleArraySize; j++)
                 {

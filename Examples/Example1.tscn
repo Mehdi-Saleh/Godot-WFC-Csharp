@@ -1086,6 +1086,8 @@ ProgressBar/styles/fill = SubResource("StyleBoxFlat_mhjrs")
 script = ExtResource("1_aghwr")
 target = NodePath("Target")
 sample = NodePath("Sample")
+H = 70
+V = 40
 
 [node name="Target" type="TileMap" parent="WFC Generator"]
 position = Vector2(-570, -298)
