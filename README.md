@@ -11,9 +11,9 @@ Features:
 - Differnt match levels are possible (through changing MATCH_RADIUS)
 - Multi-threading
 - Possibility analysis from sample
+- Fail correction
   
 To Do:
-- Fail correction
 - Chunk-based multithreading
 
 made with Godot v4.1.3
