@@ -1,2 +1,2 @@
-﻿39713
-/home/mehdi/Apps/Godot/Godot_v4.1.3-stable_mono_linux_x86_64/Godot_v4.1.3-stable_mono_linux.x86_64
+﻿36457
+/home/mehdi/Apps/Godot/Godot_v4.2.1-stable_mono_linux_x86_64/Godot_v4.2.1-stable_mono_linux.x86_64

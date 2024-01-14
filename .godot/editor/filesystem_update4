@@ -1,6 +1,4 @@
-res://Examples/Example2_WithProbablity.tscn
 res://Examples/Example1.tscn
 res://Assets/Rule.cs
 res://Assets/WFCGenerator.cs
 res://ProgressBarScript.cs
-res://Examples/Example2_BiggerRadius.tscn

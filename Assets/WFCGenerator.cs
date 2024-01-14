@@ -13,6 +13,7 @@ public partial class WFCGenerator : Node2D
 	[Export] public TileMap sample;
 	[Export] private int H = 50, V = 30; // Map size, horizontal and vertical
 	[Export] public int MATCH_RADIUS = 1; // The radius around a tile check for matching tiles with sample
+	[Export] public int CORRECTION_RADIUS = 2; // The radius around a failed tile that will be cleared on fixing. A number bigger than MATCH_RADIUS is recommended.
 	[Export] public GenerationType generationType = GenerationType.Intelligent;
 	[Export] public bool chooseByProbablity = false;
 	public int maxN; // Total number of tiles which need to be set
@@ -32,9 +33,12 @@ public partial class WFCGenerator : Node2D
 	// Holds possible options counts
 	private List<List<int>> tileMapCount;
 	private bool done = false;
+	private bool failed = false; // Will be set to true if generation fails
+	private const int TRY_FIX_TIMES = 10; // Will try to fix fails this many times before giving up
 
 	private Task generationTask;
 	private bool taskLastState = true; // true means done
+
 
 
 	[Signal] public delegate void OnDoneEventHandler(); // emitted on end of generation
@@ -112,6 +116,10 @@ public partial class WFCGenerator : Node2D
 			}
 
 			Vector2I nextTile = GetNextTile(); // Find the next tile to set
+
+			if (GetTile(nextTile)!=Vector_1)
+				failed = true;
+
 			List<Vector2I> options = GetOptions(nextTile); // What can I put in this tile?
 			if (chooseByProbablity)
 				SetTile(nextTile, ChooseOption(options)); // Set tile to a random possible option
@@ -120,6 +128,11 @@ public partial class WFCGenerator : Node2D
 			UpdateCountRadius(nextTile, MATCH_RADIUS);
 
 			currentN++;
+		}
+
+		for (int i=0; i<TRY_FIX_TIMES && failed; i++)
+		{
+			FixFail();
 		}
 	}
 
@@ -166,6 +179,21 @@ public partial class WFCGenerator : Node2D
 			}
 			tilesRepeatitions[atlasCoord]++;
 		}
+	}
+
+	// Called on fail to redraw failed parts
+	private void FixFail()
+	{
+		int clearedCount = 0;
+		foreach (Vector2I tile in GetEmptyTiles())
+		{
+			clearedCount += ClearRadius(tile, MATCH_RADIUS*2);
+			clearedCount++; // Because we need to count the middle tile (which is already empty) as well
+		}
+		currentN = maxN - clearedCount;
+
+		failed = false;
+		GenerateMap(false);
 	}
 
 	// Returns the number of possible options for the given tile coordinates
@@ -314,7 +342,7 @@ public partial class WFCGenerator : Node2D
 					bestTile.Y = j;
 				}
 			}
-		// GD.Print(leastOptions);
+			
 		return bestTile;
 	}
 
@@ -377,6 +405,48 @@ public partial class WFCGenerator : Node2D
 			}
 	}
 
+	// Set every tileMapArray cell in the specified radius and position to (-1, -1). Returns number of tiles that where not (-1, -1) before clearing.
+	private int ClearRadius(Vector2I coord, int radius)
+	{
+		int clearedCount = 0;
+
+		for (int i = coord[0] - radius; i <= coord[0] + radius; i++)
+			for (int j = coord[1] - radius; j <= coord[1] + radius; j++)
+			{
+				if (
+					i < 0
+					|| j < 0
+					|| i >= H
+					|| j >= V
+				)
+				{
+					continue;
+				}
+				Vector2I tempCoord = new Vector2I(i, j);
+				if (GetTile(tempCoord)!=Vector_1)
+					clearedCount++;
+				SetTile(tempCoord, Vector_1);
+			}
+		return clearedCount;
+	}
+	// Set every tileMapArray cell in the specified radius and position to (-1, -1). Returns number of tiles that where not (-1, -1) before clearing.
+	private int ClearRadius(int i, int j, int radius)
+	{
+		return ClearRadius(new Vector2I(i, j), radius);
+	}
+
+	// Returns a list of all tiles that are empty. (-1, -1)
+	private List<Vector2I> GetEmptyTiles()
+	{
+		List<Vector2I> tiles = new List<Vector2I>();
+		for (int i = 0; i < H; i++)
+			for (int j = 0; j < V; j++)
+				if (GetTile(i, j) == Vector_1)
+					tiles.Add(new Vector2I(i, j));
+		
+		return tiles;
+	}
+
 	// Get tile from tileMapArray using coordinates
 	private Vector2I GetTile(int coordX, int coordY)
 	{
@@ -406,6 +476,7 @@ public partial class WFCGenerator : Node2D
 		done = false;
 		taskLastState = true;
 		currentN = 0;
+		failed = false;
 
 		tileMapArray = new List<List<Vector2I>>(H + MATCH_RADIUS * 2);
 		for (int i = 0; i < H + MATCH_RADIUS * 2; i++)
