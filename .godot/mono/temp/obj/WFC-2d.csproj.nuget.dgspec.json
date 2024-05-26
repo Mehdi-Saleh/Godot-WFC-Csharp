@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/WFC-2d.csproj": {}
+    "/home/mehdi/My Projects/Godot-WFC-Csharp/WFC-2d.csproj": {}
   },
   "projects": {
-    "/home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/WFC-2d.csproj": {
+    "/home/mehdi/My Projects/Godot-WFC-Csharp/WFC-2d.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/WFC-2d.csproj",
+        "projectUniqueName": "/home/mehdi/My Projects/Godot-WFC-Csharp/WFC-2d.csproj",
         "projectName": "WFC-2d",
-        "projectPath": "/home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/WFC-2d.csproj",
+        "projectPath": "/home/mehdi/My Projects/Godot-WFC-Csharp/WFC-2d.csproj",
         "packagesPath": "/home/mehdi/.nuget/packages/",
-        "outputPath": "/home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/.godot/mono/temp/obj/",
+        "outputPath": "/home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/mehdi/.nuget/NuGet/NuGet.Config"
@@ -67,7 +67,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/7.0.114/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/8.0.102/RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,6 +1,6 @@
 is_global = true
 build_property.GodotDisabledSourceGenerators = 
-build_property.GodotProjectDir = /home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/
+build_property.GodotProjectDir = /home/mehdi/My Projects/Godot-WFC-Csharp/
 build_property.GodotProjectDirBase64 = 
 build_property.GodotSourceGenerators = 
 build_property.IsGodotToolsProject = 
@@ -13,4 +13,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WFC2d
-build_property.ProjectDir = /home/mehdi/My Projcts/WFC-2d/Godot-WFC-Csharp/
+build_property.ProjectDir = /home/mehdi/My Projects/Godot-WFC-Csharp/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
