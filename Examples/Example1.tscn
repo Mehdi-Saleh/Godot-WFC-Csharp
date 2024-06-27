@@ -1082,13 +1082,17 @@ ProgressBar/styles/fill = SubResource("StyleBoxFlat_mhjrs")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="WFC Generator" type="Node2D" parent="."]
+[node name="WFC Generator" type="Node" parent="." node_paths=PackedStringArray("target", "sample")]
 script = ExtResource("1_3r062")
+target = NodePath("Target")
+sample = NodePath("Sample")
+dimensions = Vector2i(100, 60)
 
 [node name="Target" type="TileMap" parent="WFC Generator"]
 position = Vector2(-570, -298)
 tile_set = SubResource("TileSet_hpvuk")
 format = 2
+layer_0/tile_data = PackedInt32Array(-65536, 458753, 7, 1, 458753, 7, 2, 458753, 7, 65539, 458753, 7, 65540, 458753, 7, 131076, 458753, 7, 131077, 458753, 7, 196614, 458753, 7, 196615, 458753, 7, 262151, 458753, 7, 262152, 458753, 7, 262153, 458753, 7, 327689, 458753, 7, 327690, 458753, 7, 393226, 458753, 7, 393227, 458753, 7, 393228, 458753, 7, 458764, 458753, 7, 458765, 458753, 7, 524301, 458753, 7, 524302, 458753, 7, 589838, 458753, 7, 589839, 458753, 7, 655375, 458753, 7, 720911, 458753, 7, 720912, 458753, 7, 786448, 458753, 7, 851985, 458753, 7, 917521, 458753, 7, 917522, 458753, 7, 983058, 458753, 7, 1048594, 458753, 7, 1048595, 458753, 7, 1114131, 458753, 7, 1114132, 458753, 7, 1179668, 458753, 7, 1245204, 458753, 7, 1245205, 458753, 7, 1310741, 458753, 7, 1376277, 458753, 7, 1441813, 458753, 7, 1507349, 458753, 7, 1572886, 458753, 7, 1572887, 458753, 7, 1638423, 458753, 7, 1638424, 458753, 7, 1638425, 458753, 7)
 
 [node name="Sample" type="TileMap" parent="WFC Generator"]
 tile_set = SubResource("TileSet_hpvuk")
@@ -1119,7 +1123,7 @@ grow_vertical = 0
 pivot_offset = Vector2(100, 30)
 text = "Generate"
 
-[node name="ProgressBar" type="ProgressBar" parent="UI" node_paths=PackedStringArray("generator")]
+[node name="ProgressBar" type="ProgressBar" parent="UI"]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -1135,6 +1139,5 @@ theme = SubResource("Theme_1xw26")
 max_value = 1.0
 value = 0.1
 script = ExtResource("3_hujxo")
-generator = NodePath("../../WFC Generator")
 
-[connection signal="pressed" from="UI/Button" to="WFC Generator" method="OnButtonPressed"]
+[connection signal="pressed" from="UI/Button" to="WFC Generator" method="_on_button_pressed"]

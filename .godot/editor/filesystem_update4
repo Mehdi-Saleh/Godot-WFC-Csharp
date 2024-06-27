@@ -1,4 +1,3 @@
 res://Examples/Example1.tscn
-res://Assets/Rule.cs
-res://Assets/WFCGenerator.cs
+res://Examples/WFC2DTileMap.cs
 res://ProgressBarScript.cs
