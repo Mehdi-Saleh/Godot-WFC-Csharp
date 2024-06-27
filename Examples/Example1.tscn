@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://b6unulsuw2ewh"]
 
-[ext_resource type="Script" path="res://Assets/WFCGenerator.cs" id="1_aghwr"]
+[ext_resource type="Script" path="res://Examples/WFC2DTileMap.cs" id="1_3r062"]
 [ext_resource type="Texture2D" uid="uid://dw8aiakn0sc1f" path="res://Assets/colored_packed.png" id="2_gn0ki"]
 [ext_resource type="Script" path="res://ProgressBarScript.cs" id="3_hujxo"]
 
@@ -1082,12 +1082,8 @@ ProgressBar/styles/fill = SubResource("StyleBoxFlat_mhjrs")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="WFC Generator" type="Node2D" parent="." node_paths=PackedStringArray("target", "sample")]
-script = ExtResource("1_aghwr")
-target = NodePath("Target")
-sample = NodePath("Sample")
-H = 70
-V = 40
+[node name="WFC Generator" type="Node2D" parent="."]
+script = ExtResource("1_3r062")
 
 [node name="Target" type="TileMap" parent="WFC Generator"]
 position = Vector2(-570, -298)

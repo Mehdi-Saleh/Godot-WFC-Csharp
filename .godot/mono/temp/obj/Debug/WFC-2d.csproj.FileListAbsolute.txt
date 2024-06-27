@@ -44,9 +44,9 @@
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.AssemblyInfo.cs
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.csproj.CoreCompileInputs.cache
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.sourcelink.json
-/home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.csproj.CopyComplete
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.dll
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/refint/WFC-2d.dll
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.pdb
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.genruntimeconfig.cache
 /home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/ref/WFC-2d.dll
+/home/mehdi/My Projects/Godot-WFC-Csharp/.godot/mono/temp/obj/Debug/WFC-2d.csproj.Up2Date

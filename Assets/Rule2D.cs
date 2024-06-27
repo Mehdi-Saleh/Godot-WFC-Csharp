@@ -6,53 +6,58 @@ using System.Numerics;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 
-public partial class Rule : Node
+public partial class Rule2D<T> // DECOUPLE
 {
-	public List<List<Vector2I>> RuleArray {get; private set;}
-	protected static Vector2I Vector_1 = new Vector2I(-1, -1);
+	public List<List<T>> RuleArray { get; private set; }
+	protected static Vector2I Vector_1 = new Vector2I( -1, -1 );
+	private T zeroValue;
 
-	public Rule(int matchRadius)
+	public Rule2D( int matchRadius, T zeroValue )
 	{
-		CreateRuleArray(matchRadius);
+		this.zeroValue = zeroValue;
+		CreateRuleArray( matchRadius );
 	}
 
-	public Rule(int matchRadius, Vector2I[,] suroundings)
+	public Rule2D( int matchRadius, T[,] suroundings, T zeroValue )
 	{
-		CreateRuleArray(matchRadius);
-		for (int i=0; i<RuleArray.Count; i++)
-			for (int j=0; j<RuleArray.Count; j++)
+		this.zeroValue = zeroValue;
+		CreateRuleArray( matchRadius );
+		for ( int i = 0; i < RuleArray.Count; i++ )
+			for ( int j = 0; j < RuleArray.Count; j++ )
 			{
-				RuleArray[i][j] = suroundings[i,j];
+				RuleArray[ i ][ j ] = suroundings[ i,j ];
 			}
 	}
 
-	public Rule(int matchRadius, Vector2I position, in TileMap sample)
+	public Rule2D( int matchRadius, Vector2I position, in TileMap sample, T zeroValue )
 	{
-		Vector2I matchRadVector = new Vector2I(matchRadius, matchRadius);
-		CreateRuleArray(matchRadius);
-		for (int i=0; i<RuleArray.Count; i++)
-			for (int j=0; j<RuleArray.Count; j++)
+		this.zeroValue = zeroValue;
+		Vector2I matchRadVector = new Vector2I( matchRadius, matchRadius );
+		CreateRuleArray( matchRadius );
+		for ( int i = 0; i < RuleArray.Count; i++ )
+			for ( int j = 0; j < RuleArray.Count; j++ )
 			{
-				RuleArray[i][j] = sample.GetCellAtlasCoords(0, position-matchRadVector+new Vector2I(i,j));
+				RuleArray[ i ][ j ] = sample.GetCellAtlasCoords( 0, position-matchRadVector+new Vector2I( i,j ) );
 			}
 	}
 	
-	public Rule(int matchRadius, Vector2I position, in List<List<Vector2I>> tilesArray, bool offsetPos=true)
+	public Rule2D( int matchRadius, Vector2I position, in List<List<T>> tilesArray, bool offsetPos=true, T zeroValue )
 	{
-		Vector2I matchRadVector = new Vector2I(matchRadius, matchRadius);
-		CreateRuleArray(matchRadius);
-		for (int i=0; i<RuleArray.Count; i++)
-			for (int j=0; j<RuleArray.Count; j++)
+		this.zeroValue = zeroValue;
+		Vector2I matchRadVector = new Vector2I( matchRadius, matchRadius );
+		CreateRuleArray( matchRadius );
+		for ( int i = 0; i < RuleArray.Count; i++ )
+			for ( int j = 0; j < RuleArray.Count; j++ )
 			{
-				if (offsetPos)
-					RuleArray[i][j] = tilesArray[position.X+i][position.Y+j];
+				if ( offsetPos )
+					RuleArray[ i ][ j ] = tilesArray[ position.X+i ][ position.Y+j ];
 				else
-					RuleArray[i][j] = tilesArray[position.X-matchRadius+i][position.Y-matchRadius+j];
+					RuleArray[ i ][ j ] = tilesArray[ position.X-matchRadius+i ][ position.Y-matchRadius+j ];
 			}
 	}
 
 
-	// creates a new RuleArray
+	// Creates a new RuleArray
 	protected void CreateRuleArray(int matchRadius)
 	{
 		RuleArray = new List<List<Vector2I>>(1+matchRadius*2);

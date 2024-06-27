@@ -1,12 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "hu9uSlrbC9WmdQSnVOPdZfhZ/wyXRumbIsIBteJaTfPl/ymgxOsdv+Awr/VzOgLJmbNSm9BV4tTUdq0BUJXvvw==",
+  "dgSpecHash": "O0uU7W1uAGs=",
   "success": true,
   "projectFilePath": "/home/mehdi/My Projects/Godot-WFC-Csharp/WFC-2d.csproj",
   "expectedPackageFiles": [
     "/home/mehdi/.nuget/packages/godot.sourcegenerators/4.2.1/godot.sourcegenerators.4.2.1.nupkg.sha512",
     "/home/mehdi/.nuget/packages/godotsharp/4.2.1/godotsharp.4.2.1.nupkg.sha512",
-    "/home/mehdi/.nuget/packages/godotsharpeditor/4.2.1/godotsharpeditor.4.2.1.nupkg.sha512"
+    "/home/mehdi/.nuget/packages/godotsharpeditor/4.2.1/godotsharpeditor.4.2.1.nupkg.sha512",
+    "/home/mehdi/.nuget/packages/microsoft.netcore.app.ref/6.0.30/microsoft.netcore.app.ref.6.0.30.nupkg.sha512",
+    "/home/mehdi/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.30/microsoft.aspnetcore.app.ref.6.0.30.nupkg.sha512"
   ],
   "logs": []
 }
