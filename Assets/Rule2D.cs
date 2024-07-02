@@ -2,6 +2,7 @@ using Godot;
 using Godot.NativeInterop;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Numerics;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -36,9 +37,14 @@ public partial class Rule2D<T> // DECOUPLE
 		for ( int i = 0; i < RuleArray.Count; i++ )
 			for ( int j = 0; j < RuleArray.Count; j++ )
 			{
-				// TODO this really needs to change
-				if ( position.X-matchRadius-i >= 0 && position.Y-matchRadius-j >= 0 && position.X < sample.Count-matchRadius-i && position.Y < sample[0].Count-matchRadius-j )
+				try
+				{
 					RuleArray[ i ][ j ] = sample[ position.X-matchRadius+i ][ position.Y-matchRadius+j ];
+				}
+				catch ( ArgumentOutOfRangeException err )
+				{
+					// RuleArray[ i ][ j ] = zeroValue;
+				}
 			}
 	}
 	
@@ -116,7 +122,7 @@ public partial class Rule2D<T> // DECOUPLE
 		return true;
 	}
 
-	// returns true if the two rules are identic
+	// returns true if the two rules are identical
 	public static bool CompareRules( Rule2D<T> rule1, Rule2D<T> rule2, bool ignore_1InRule2 = false )
 	{
 		int RuleArraySize = rule1.RuleArray.Count;
