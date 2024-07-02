@@ -1087,7 +1087,7 @@ script = ExtResource("1_3r062")
 target = NodePath("Target")
 sample = NodePath("Sample")
 progressBar = NodePath("../UI/ProgressBar")
-dimensions = Vector2i(50, 40)
+dimensions = Vector2i(71, 35)
 
 [node name="Target" type="TileMap" parent="WFC Generator"]
 position = Vector2(-570, -298)

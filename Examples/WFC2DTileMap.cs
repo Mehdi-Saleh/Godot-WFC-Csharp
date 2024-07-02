@@ -20,13 +20,14 @@ public partial class WFC2DTileMap : Node
 
 	public override void _Ready()
 	{
-		generator = new WFCGenerator2D<Vector2I>( new Vector2I( -1, -1 ), dimensions.X, dimensions.Y, matchRadius, correctionRadius, generationType, chooseByProbablity );
-		generator.sample = ExtractSample();
+		var sampleArray = ExtractSample();
+		generator = new WFCGenerator2D<Vector2I>( new Vector2I( -1, -1 ), dimensions.X, dimensions.Y, sampleArray, matchRadius, correctionRadius, generationType, chooseByProbablity );
 		generator.OnGenerationTaskDone = OnGenerationTaskDone;
 		sample.Hide();
 
 		generator.Ready();
 	}
+
 
     public override void _Process( double delta )
     {
@@ -38,13 +39,14 @@ public partial class WFC2DTileMap : Node
     }
 
 
+	// Called when the generation is finished
 	public void OnGenerationTaskDone()
 	{
 		ApplyTileMapArray();
-		GD.Print( "Done!" );
 	}
 
 
+	// Returns an array of the tiles from the sample tile map.
 	public List<List<Vector2I>> ExtractSample()
 	{
 		sampleArray.Clear();
@@ -64,6 +66,7 @@ public partial class WFC2DTileMap : Node
 	}
 
 
+	// Applies the generated tiles on the tile map.
 	public void ApplyTileMapArray()
 	{
 		for ( int i = 0; i < dimensions.X; i++ )

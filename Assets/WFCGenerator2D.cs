@@ -12,16 +12,14 @@ public partial class WFCGenerator2D<T>
 {
 	private Vector2I VECTOR_1 = new Vector2I( -1, -1 );
 	private T zeroValue;
-
 	private int height = 50, width = 30; // Map size, horizontal and vertical
 	public int MATCH_RADIUS = 1; // The radius around a tile check for matching tiles with sample
 	public int CORRECTION_RADIUS = 2; // The radius around a failed tile that will be cleared on fixing. A number bigger than MATCH_RADIUS is recommended.
-	public GenerationType generationType = GenerationType.Intelligent;
-	public bool chooseByProbablity = false;
+	public GenerationType generationType = GenerationType.Intelligent; // Currently supports one mode only
+	public bool chooseByProbablity = false; // If set to True, number of occurance for each tile will be taken into account when choosing tiles
 	public int maxN; // Total number of tiles which need to be set
 	public int currentN = 0; // Number of tiles that are currently set
 
-	// [Export] public bool showProgress = true; // If you know the code works for you disable this as it may impact performance
 
 
 	// Holds tile occurrences in the sample for future use as rules
@@ -29,13 +27,14 @@ public partial class WFCGenerator2D<T>
 	// Holds number of repeatitions of each option. Used for calculating occurance probablity
 	private Dictionary<T, int> tilesRepeatitions = new Dictionary<T, int>(); // DECOUPLE
 
-	// Holds tiles data for internal use only. DO NOT USED DIRECTLY! Use SetTile() and GetTile() instead
-	private List<List<T>> tileMapArray;
+	// Holds tiles data for internal use only. DO NOT USE DIRECTLY! Use SetTile() and GetTile() instead
+	private List<List<T>> tilesArray;
 
-	// Holds possible options counts
-	private List<List<int>> tileMapCount;
+	// Holds possible options counts for every tile
+	private List<List<int>> tilesCounts;
+	// The sample array where rules are generated from. Needs to be set from another class before calling Ready()
 	public List<List<T>> sample;
-	private bool done = false;
+
 	private bool failed = false; // Will be set to true if generation fails
 	private const int TRY_FIX_TIMES = 10; // Will try to fix fails this many times before giving up
 
@@ -49,11 +48,12 @@ public partial class WFCGenerator2D<T>
 	public Action OnGenerationTaskDone;
 
 
-	public WFCGenerator2D( T zeroValue, int height, int width, int match_radius, int correctionRadius, GenerationType generationType, bool chooseByProbablity )
+	public WFCGenerator2D( T zeroValue, int height, int width, List<List<T>> sample, int match_radius, int correctionRadius, GenerationType generationType, bool chooseByProbablity )
 	{
 		this.zeroValue = zeroValue;
 		this.height = height;
 		this.width = width;
+		this.sample = sample;
 		this.MATCH_RADIUS = match_radius;
 		this.CORRECTION_RADIUS = correctionRadius;
 		this.generationType = generationType;
@@ -62,29 +62,28 @@ public partial class WFCGenerator2D<T>
 
 
 
-	[Signal] public delegate void OnDoneEventHandler(); // emitted on end of generation
+	[ Signal ] public delegate void OnDoneEventHandler(); // emitted on end of generation
 
 
-	// Called when the node enters the scene tree for the first time.
+	// Called when the node enters the scene tree for the first time. Needs to be called by another class after generating this class.
 	public async void Ready()
 	{
-		tileMapArray = new List<List<T>>( height + MATCH_RADIUS * 2 );
+		tilesArray = new List<List<T>>( height + MATCH_RADIUS * 2 );
 		for ( int i = 0; i < height + MATCH_RADIUS * 2; i++ )
 		{
-			tileMapArray.Add( new List<T>( width + MATCH_RADIUS * 2 ) );
+			tilesArray.Add( new List<T>( width + MATCH_RADIUS * 2 ) );
 			for ( int j = 0; j < width + MATCH_RADIUS * 2; j++ )
-				tileMapArray[ i ].Add( zeroValue );
+				tilesArray[ i ].Add( zeroValue );
 		}
 
-		tileMapCount = new List<List<int>>( height );
+		tilesCounts = new List<List<int>>( height );
 		for ( int i = 0; i < height + MATCH_RADIUS * 2; i++ )
 		{
-			tileMapCount.Add(new List<int>( width ));
+			tilesCounts.Add( new List<int>( width ) );
 			for ( int j = 0; j < width; j++ )
-				tileMapCount[ i ].Add( -1 );
+				tilesCounts[ i ].Add( -1 );
 		}
 
-		// sample.Hide();
 		maxN = height * width;
 		Init(); // Needs to be called to initialize usedTiles (to create rules)
 		ClearMap();
@@ -96,21 +95,13 @@ public partial class WFCGenerator2D<T>
 	// Called every frame
 	public void Process( double delta )
 	{
-		// if (showProgress)
-		// 	ApplyTileMap();
-
-
 		// Do stuff on task finish
 		if ( taskLastState == false )
 		{
 			taskLastState = generationTask.IsCompleted;
 			if ( taskLastState )
 			{
-				// ApplyTileMap();
-				// EmitSignal( SignalName.OnDone );
 				OnGenerationTaskDone();
-				// SetTile( new Vector2I( 0, 1 ), zeroValue );
-				// SetTile( new Vector2I( 0, 2 ), zeroValue );
 			}
 		}
 	}
@@ -128,20 +119,15 @@ public partial class WFCGenerator2D<T>
 	// Generates Map
 	private void _GenerateMap( bool clearTarget = true )
 	{
-		if (clearTarget) 
+		if ( clearTarget ) 
 			ClearMap();
 		UpdateCountAll();
 
 		while ( currentN < maxN )
 		{
-			// GD.Print( "-1" );
 			Vector2I nextTile = GetNextTile(); // Find the next tile to set
-			// GD.Print( nextTile );
 
-			// GD.Print( "-2" );
 			List< T > options = GetOptions( nextTile ); // What can I put in this tile?
-			// GD.Print( "-3" );
-			// GD.Print( options.Count );
 			if ( options.Count == 0 )
 				{
 					failed = true;
@@ -149,7 +135,6 @@ public partial class WFCGenerator2D<T>
 					currentN++;
 					continue;
 				}
-				// GD.Print( "failed! ", currentN, ",", maxN );
 
 			if ( chooseByProbablity )
 				SetTile( nextTile, ChooseOption( options ) ); // Set tile to a random possible option
@@ -159,7 +144,6 @@ public partial class WFCGenerator2D<T>
 			UpdateCountRadius( nextTile, MATCH_RADIUS );
 
 			currentN++;
-			// GD.Print( currentN );
 		}
 
 		GD.Print( failed );
@@ -170,25 +154,13 @@ public partial class WFCGenerator2D<T>
 	}
 
 
-	// // Applies the tiles array to the target tile map
-	// public virtual ApplyTileMap()
-	// {
-	// 	// for (int i = 0; i < H; i++)
-	// 	// 	for (int j = 0; j < V; j++)
-	// 	// 	{
-	// 	// 		target.SetCell(0, new Vector2I(i, j), 1, GetTile(i, j));
-	// 	// 	}
-	// }
-
-
 	// Analyses sample for rules. Must be called once before _ready
 	public void Init()
 	{
-		// GD.Print( "init" );
 		usedRules.Clear();
-		// Godot.Collections.Array< T > usedCells = sample.GetUsedCells( 0 );
+
 		for ( int i = 0; i < sample.Count; i++ )
-			for ( int j = 0; j < sample[0].Count; j++ )
+			for ( int j = 0; j < sample[ 0 ].Count; j++ )
 			{
 				T cellValue = sample[ i ][ j ];
 
@@ -203,9 +175,9 @@ public partial class WFCGenerator2D<T>
 					usedRules.Add( cellValue, new List< Rule2D< T > >() );
 				}
 
-				Rule2D< T > rule = new Rule2D< T >( MATCH_RADIUS, new Vector2I( i, j ), in sample, zeroValue );
+				Rule2D<T> rule = new Rule2D<T>( MATCH_RADIUS, new Vector2I( i, j ), in sample, zeroValue );
 				bool repeated = false;
-				foreach ( Rule2D< T > r in usedRules[ cellValue ] ) 
+				foreach ( Rule2D<T> r in usedRules[ cellValue ] ) 
 					if ( r.CompareWith( rule ) )
 					{
 						repeated = true;
@@ -217,7 +189,7 @@ public partial class WFCGenerator2D<T>
 					}
 
 
-				// add to tilesRepeatitions
+				// Add to tilesRepeatitions
 				if ( !tilesRepeatitions.ContainsKey( cellValue ) )
 				{
 					tilesRepeatitions.Add( cellValue, 0 );
@@ -226,6 +198,7 @@ public partial class WFCGenerator2D<T>
 			}
 
 	}
+
 
 	// Called on fail to redraw failed parts
 	private void FixFail()
@@ -239,8 +212,9 @@ public partial class WFCGenerator2D<T>
 		currentN = maxN - clearedCount;
 
 		failed = false;
-		GenerateMap(false);
+		GenerateMap( false );
 	}
+
 
 	// Returns the number of possible options for the given tile coordinates
 	private int GetOptionsCount( Vector2I coord )
@@ -249,7 +223,7 @@ public partial class WFCGenerator2D<T>
 			return 0;
 
 		int count = 0;
-		foreach (T atlasCoord in usedRules.Keys)
+		foreach ( T atlasCoord in usedRules.Keys )
 		{
 			bool f = true;
 			bool b = false;
@@ -298,7 +272,7 @@ public partial class WFCGenerator2D<T>
 	{
 		List<T> options = new List<T>();
 
-		// Return an empty list if coords ar ( -1, -1 )
+		// Return an empty list if coords are ( -1, -1 )
 		if ( coord == VECTOR_1 )
 		{
 			return options;
@@ -344,9 +318,10 @@ public partial class WFCGenerator2D<T>
 			// }
 			if ( f ) options.Add( tileValue );
 		}
-		// GD.Print( "snthtshstnhtsthsh", options.Count );
+
 		return options;
 	}
+
 
 	// chooses a tile from the given options based on its occurance probablity
 	private T ChooseOption( in List<T> options )
@@ -372,6 +347,7 @@ public partial class WFCGenerator2D<T>
 		return zeroValue;
 	}
 
+
 	// returns true if the two given tiles match (or if one of them is not set)
 	private bool DoTilesMatch(T tile1, T tile2)
 	{
@@ -385,6 +361,7 @@ public partial class WFCGenerator2D<T>
 		return match;
 	}
 
+
 	// Returns the tile with the least possible options. 
 	private Vector2I GetNextTile()
 	{
@@ -393,15 +370,14 @@ public partial class WFCGenerator2D<T>
 		for ( int i = 0; i < height; i++ )
 			for ( int j = 0; j < width; j++ )
 			{
-				if ( tileMapCount[ i ][ j ] < leastOptions && tileMapCount[ i ][ j ] > 0 )
+				if ( tilesCounts[ i ][ j ] < leastOptions && tilesCounts[ i ][ j ] > 0 )
 				{
-					leastOptions = tileMapCount[ i ][ j ];
+					leastOptions = tilesCounts[ i ][ j ];
 					bestTile.X = i;
 					bestTile.Y = j;
 				}
 			}
-			
-		// GD.Print( bestTile, " ", leastOptions );
+
 		return bestTile;
 	}
 
@@ -414,11 +390,12 @@ public partial class WFCGenerator2D<T>
 			{
 				Vector2I coord = new Vector2I( i, j );
 				if ( !GetTile( coord ).Equals( zeroValue ) )
-					tileMapCount[ i ][ j ] = 0;
+					tilesCounts[ i ][ j ] = 0;
 				else
-					tileMapCount[ i ][ j ] = GetOptionsCount( coord );
+					tilesCounts[ i ][ j ] = GetOptionsCount( coord );
 			}
 	}
+
 
 	private void UpdateCountRadius( Vector2I coord, int radius )
 	{
@@ -438,7 +415,7 @@ public partial class WFCGenerator2D<T>
 				}
 				Vector2I tempCoord = new Vector2I(i, j);
 				if ( !GetTile( tempCoord ).Equals( zeroValue ) )
-					tileMapCount[i][j] = 0;
+					tilesCounts[i][j] = 0;
 				else
 				{
 					tasks.Add( Task<int>.Factory.StartNew( () => { return GetOptionsCount( tempCoord ); } ) );
@@ -450,24 +427,23 @@ public partial class WFCGenerator2D<T>
 		Task.WaitAll( tasks.ToArray() );
 		for ( int i = 0; i < tasks.Count; i++ )
 		{
-			tileMapCount[ counts[ i ][ 0 ] ][ counts[ i ][ 1 ] ] = tasks[ i ].Result;
-			// GD.Print( tasks[ i ].Result );
+			tilesCounts[ counts[ i ][ 0 ] ][ counts[ i ][ 1 ] ] = tasks[ i ].Result;
 		}
 	}
 
 
-	// Set every tileMapArray cell to (-1, -1)
+	// Set every tilesArray cell to (-1, -1)
 	private void ClearMap()
 	{
 		for ( int i = 0; i < height + MATCH_RADIUS * 2; i++ )
 			for ( int j = 0; j < width + MATCH_RADIUS * 2; j++ )
 			{
-				tileMapArray[i][j] = zeroValue;
+				tilesArray[i][j] = zeroValue;
 			}
 	}
 
 
-	// Set every tileMapArray cell in the specified radius and position to (-1, -1). Returns number of tiles that where not (-1, -1) before clearing.
+	// Set every tilesArray cell in the specified radius and position to (-1, -1). Returns number of tiles that where not (-1, -1) before clearing.
 	private int ClearRadius( Vector2I coord, int radius )
 	{
 		int clearedCount = 0;
@@ -492,7 +468,7 @@ public partial class WFCGenerator2D<T>
 		return clearedCount;
 	}
 
-	// Set every tileMapArray cell in the specified radius and position to (-1, -1). Returns number of tiles that where not (-1, -1) before clearing.
+	// Set every tilesArray cell in the specified radius and position to (-1, -1). Returns number of tiles that where not (-1, -1) before clearing.
 	private int ClearRadius( int i, int j, int radius )
 	{
 		return ClearRadius( new Vector2I( i, j ), radius );
@@ -503,20 +479,21 @@ public partial class WFCGenerator2D<T>
 	private List< Vector2I > GetEmptyTiles()
 	{
 		List< Vector2I > tiles = new List< Vector2I >();
-		for (int i = 0; i < height; i++)
-			for (int j = 0; j < width; j++)
+		for ( int i = 0; i < height; i++ )
+			for ( int j = 0; j < width; j++ )
 				if ( GetTile( i, j ).Equals( zeroValue ) )
-					tiles.Add(new Vector2I(i, j));
+					tiles.Add( new Vector2I( i, j ) );
 		
 		return tiles;
 	}
 
-	// Get tile from tileMapArray using coordinates
-	public T GetTile(int coordX, int coordY)
+
+	// Get tile from tilesArray using coordinates
+	public T GetTile( int coordX, int coordY )
 	{
-		return tileMapArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ];
+		return tilesArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ];
 	}
-	// Get tile from tileMapArray using coordinates
+	// Get tile from tilesArray using coordinates
 
 	public T GetTile( Vector2I coord )
 	{
@@ -524,46 +501,46 @@ public partial class WFCGenerator2D<T>
 	}
 
 
-	// Set tile on tileMapArray using coordinates
+	// Set tile on tilesArray using coordinates
 	private void SetTile( int coordX, int coordY, T value )
 	{
-		// GD.Print( "set" );
-		tileMapArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ] = value;
+		tilesArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ] = value;
 	}
 
-	// Set tile on tileMapArray using coordinates
+	// Set tile on tilesArray using coordinates
 	private void SetTile( Vector2I coord, T value )
 	{
-		// GD.Print( value );
 		SetTile( coord[ 0 ], coord[ 1 ], value );
 	}
 
 
 
+	// Starts generating a new map. Does not reinitialize rules
 	public void StartGeneration()
 	{
-		done = false;
 		taskLastState = true;
 		currentN = 0;
 		failed = false;
 
-		tileMapArray = new List< List< T > >( height + MATCH_RADIUS * 2 );
+		// Create new arrays
+		tilesArray = new List<List<T>>( height + MATCH_RADIUS * 2 );
 		for ( int i = 0; i < height + MATCH_RADIUS * 2; i++ )
 		{
-			tileMapArray.Add( new List< T >( width + MATCH_RADIUS * 2 ) );
+			tilesArray.Add( new List<T>( width + MATCH_RADIUS * 2 ) );
 			for ( int j = 0; j < width + MATCH_RADIUS * 2; j++ )
-				tileMapArray[ i ].Add( zeroValue );
+				tilesArray[ i ].Add( zeroValue );
 		}
 
-		tileMapCount = new List<List<int>>( height );
+		tilesCounts = new List<List<int>>( height );
 		for (int i = 0; i < height + MATCH_RADIUS * 2; i++)
 		{
-			tileMapCount.Add(new List<int>( width ) );
+			tilesCounts.Add( new List<int>( width ) );
 			for ( int j = 0; j < width; j++ )
-				tileMapCount[ i ].Add( -1 );
+				tilesCounts[ i ].Add( -1 );
 		}
 
-		// sample.Hide();
+		
+		// Generate
 		maxN = height * width;
 		ClearMap();
 		UpdateCountAll();

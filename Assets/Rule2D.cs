@@ -7,11 +7,13 @@ using System.Numerics;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 
-public partial class Rule2D<T> // DECOUPLE
+public partial class Rule2D<T>
 {
+	// This is the array of tiles that create this rule.
 	public List<List<T>> RuleArray { get; private set; }
 	protected static Vector2I Vector_1 = new Vector2I( -1, -1 );
 	private T zeroValue;
+
 
 	public Rule2D( int matchRadius, T zeroValue )
 	{
@@ -43,7 +45,7 @@ public partial class Rule2D<T> // DECOUPLE
 				}
 				catch ( ArgumentOutOfRangeException err )
 				{
-					// RuleArray[ i ][ j ] = zeroValue;
+					RuleArray[ i ][ j ] = zeroValue;
 				}
 			}
 	}
@@ -51,7 +53,6 @@ public partial class Rule2D<T> // DECOUPLE
 	public Rule2D( int matchRadius, Vector2I position, in List<List<T>> tilesArray,  T zeroValue, bool offsetPos=true )
 	{
 		this.zeroValue = zeroValue;
-		Vector2I matchRadVector = new Vector2I( matchRadius, matchRadius );
 		CreateRuleArray( matchRadius );
 		for ( int i = 0; i < RuleArray.Count; i++ )
 			for ( int j = 0; j < RuleArray.Count; j++ )
@@ -64,7 +65,7 @@ public partial class Rule2D<T> // DECOUPLE
 	}
 
 
-	// Creates a new RuleArray
+	// Creates a new rules array.
 	protected void CreateRuleArray(int matchRadius)
 	{
 		RuleArray = new List<List<T>>( 1 + matchRadius*2 );
@@ -77,34 +78,34 @@ public partial class Rule2D<T> // DECOUPLE
 	}
 
 
-	// returns match radios based on current RuleArray size
+	// Returns match radios based on current RuleArray size.
 	public int GetMatchRadius()
 	{
-		return (RuleArray.Count-1)/2;
+		return ( RuleArray.Count-1 )/2;
 	}
 
 
-	// returns this rule in the shape of an array
+	// Returns this rule in the shape of an array.
 	public T[,] GetArray()
 	{
-		T[,] arr = new T[RuleArray.Count, RuleArray.Count];
-		for (int i=0; i<arr.GetLength(0); i++)
-			for (int j=0; j<arr.GetLength(1); j++)
+		T[,] arr = new T[ RuleArray.Count, RuleArray.Count ];
+		for ( int i=0; i<arr.GetLength( 0 ); i++ )
+			for ( int j=0; j<arr.GetLength( 1 ); j++ )
 			{
-				arr[i,j] = RuleArray[i][j];
+				arr[ i, j ] = RuleArray[ i ][ j ];
 			}
 		return arr;
 	}
 
 
-	// returns true if the two rules are identic
+	// Returns true if the two rules are identic.
 	public bool CompareWith( Rule2D<T> rule, bool ignore_1InRule2 = false )
 	{
 		return CompareRules( this, rule, ignore_1InRule2 );
 	}
 
 
-	// returns true if this rule is suitablble to be appiled on the set of given tiles
+	// Returns true if this rule is suitable to be appiled on the set of given tiles.
 	public bool CompareWithTiles( T[,] tilesArray )
 	{
 		if ( tilesArray.GetLength( 0 ) != RuleArray.Count
@@ -112,8 +113,8 @@ public partial class Rule2D<T> // DECOUPLE
 			return false;
 
 
-		for (int i=0; i<RuleArray.Count; i++)
-			for (int j=0; j<RuleArray.Count; j++)
+		for ( int i = 0; i < RuleArray.Count; i++ )
+			for ( int j = 0; j < RuleArray.Count; j++ )
 			{
 				if ( !tilesArray[ i, j ].Equals( zeroValue ) && !tilesArray[ i, j ].Equals( RuleArray[ i ][ j ] ) )
 					return false;
@@ -122,7 +123,8 @@ public partial class Rule2D<T> // DECOUPLE
 		return true;
 	}
 
-	// returns true if the two rules are identical
+
+	// Returns true if the two rules are identical.
 	public static bool CompareRules( Rule2D<T> rule1, Rule2D<T> rule2, bool ignore_1InRule2 = false )
 	{
 		int RuleArraySize = rule1.RuleArray.Count;
@@ -153,25 +155,26 @@ public partial class Rule2D<T> // DECOUPLE
 	}
 
 
-	// returns true if the two given tiles match (or if the first one is not set)
-	private static bool DoTilesMatch(T tile1, T tile2)
+	// Returns true if the two given tiles match (or if the first one is not set).
+	private static bool DoTilesMatch( T tile1, T tile2 )
 	{
 		return tile1.Equals( Vector_1 ) || tile2.Equals( tile1 );
 	}
 
-	// print the rule in console, for debugging purposes
+
+	// Prints the rule in console, for debugging purposes.
 	public void Print()
 	{
-		GD.Print("{");
-		for (int i=0; i<RuleArray.Count; i++)
+		GD.Print( "{" );
+		for ( int i = 0; i < RuleArray.Count; i++ )
 		{
 			string s="";
-			for (int j=0; j<RuleArray.Count; j++)
+			for ( int j=0; j<RuleArray.Count; j++ )
 			{
-				s += RuleArray[j][i].ToString()+",";
+				s += RuleArray[ j ][ i ].ToString()+",";
 			}
-			GD.Print(s);
+			GD.Print( s );
 		}
-		GD.Print("}");
+		GD.Print( "}" );
 	}
 }
