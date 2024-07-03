@@ -1078,7 +1078,7 @@ bg_color = Color(0, 0.65098, 0.890196, 1)
 /styles/color = SubResource("StyleBoxFlat_yulyx")
 ProgressBar/styles/fill = SubResource("StyleBoxFlat_mhjrs")
 
-[node name="Garden" type="Node2D"]
+[node name="ExampleTileMap" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 

@@ -2,3 +2,7 @@ res://Examples/Example1.tscn
 res://Examples/Example1-TileMap.tscn
 res://Assets/Scripts/WFC2DTileMap.cs
 res://ProgressBarScript.cs
+res://Assets/3D/Scenes/tile.tscn
+res://Assets/3D/Scenes/all_tiles.tscn
+res://Examples/Example2-GridMap.tscn
+res://Assets/3D/Scenes/mesh_library.tres
