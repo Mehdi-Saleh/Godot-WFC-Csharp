@@ -6,3 +6,4 @@ res://Assets/3D/Scenes/tile.tscn
 res://Assets/3D/Scenes/all_tiles.tscn
 res://Examples/Example2-GridMap.tscn
 res://Assets/3D/Scenes/mesh_library.tres
+res://Assets/Scripts/WFC2DGridMap.cs

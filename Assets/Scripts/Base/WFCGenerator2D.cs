@@ -36,7 +36,7 @@ public partial class WFCGenerator2D<T>
 	public List<List<T>> sample;
 
 	private bool failed = false; // Will be set to true if generation fails
-	private const int TRY_FIX_TIMES = 10; // Will try to fix fails this many times before giving up
+	private const int TRY_FIX_TIMES = 20; // Will try to fix fails this many times before giving up
 
 	private Task generationTask;
 	private bool taskLastState = true; // true means done
@@ -108,16 +108,16 @@ public partial class WFCGenerator2D<T>
 
 
 	// Starts generation task
-	public void GenerateMap( bool clearTarget = true )
+	public void GenerateMap( bool clearTarget = true, bool shouldFixFails = true )
 	{
 		taskLastState = false;
-		generationTask = Task.Run( () => { _GenerateMap( clearTarget ); } );
+		generationTask = Task.Run( () => { _GenerateMap( clearTarget, shouldFixFails ); } );
 	}
 
 
 
 	// Generates Map
-	private void _GenerateMap( bool clearTarget = true )
+	private void _GenerateMap( bool clearTarget = true, bool shouldFixFails = true )
 	{
 		if ( clearTarget ) 
 			ClearMap();
@@ -129,12 +129,12 @@ public partial class WFCGenerator2D<T>
 
 			List< T > options = GetOptions( nextTile ); // What can I put in this tile?
 			if ( options.Count == 0 )
-				{
-					failed = true;
-					GD.Print( "fail" );
-					currentN++;
-					continue;
-				}
+			{
+				failed = true;
+				// GD.Print( "fail" );
+				currentN++;
+				continue;
+			}
 
 			if ( chooseByProbablity )
 				SetTile( nextTile, ChooseOption( options ) ); // Set tile to a random possible option
@@ -146,11 +146,11 @@ public partial class WFCGenerator2D<T>
 			currentN++;
 		}
 
-		GD.Print( failed );
-		for ( int i=0; i<TRY_FIX_TIMES && failed; i++ )
-		{
-			FixFail();
-		}
+		if ( shouldFixFails )
+			for ( int i=0; i<TRY_FIX_TIMES && failed; i++ )
+			{
+				FixFail();
+			}
 	}
 
 
@@ -172,7 +172,7 @@ public partial class WFCGenerator2D<T>
 				// generate rule
 				if ( !usedRules.ContainsKey( cellValue ) )
 				{
-					usedRules.Add( cellValue, new List< Rule2D< T > >() );
+					usedRules.Add( cellValue, new List<Rule2D<T>>() );
 				}
 
 				Rule2D<T> rule = new Rule2D<T>( MATCH_RADIUS, new Vector2I( i, j ), in sample, zeroValue );
@@ -184,9 +184,10 @@ public partial class WFCGenerator2D<T>
 						break;
 					}
 				if ( !repeated )
-					{
-						usedRules[ cellValue ].Add( rule );
-					}
+				{
+					usedRules[ cellValue ].Add( rule );
+					rule.Print();
+				}
 
 
 				// Add to tilesRepeatitions
@@ -196,7 +197,7 @@ public partial class WFCGenerator2D<T>
 				}
 				tilesRepeatitions[ cellValue ]++;
 			}
-
+		GD.Print( usedRules.Count );
 	}
 
 
@@ -212,7 +213,7 @@ public partial class WFCGenerator2D<T>
 		currentN = maxN - clearedCount;
 
 		failed = false;
-		GenerateMap( false );
+		GenerateMap( false, false );
 	}
 
 
@@ -291,8 +292,7 @@ public partial class WFCGenerator2D<T>
 						bool anyMatch = false;
 						foreach ( Rule2D< T > rule in usedRules[ tileValue ] )
 						{
-							if ( DoTilesMatch( GetTile( coord + new Vector2I( i, j ) ), rule.RuleArray[ MATCH_RADIUS+i ][ MATCH_RADIUS+j ] ) )
-								anyMatch = true;
+							anyMatch = anyMatch || DoTilesMatch( GetTile( coord + new Vector2I( i, j ) ), rule.RuleArray[ MATCH_RADIUS+i ][ MATCH_RADIUS+j ] ) ;
 						}
 						if (!anyMatch)
 						{
@@ -349,16 +349,9 @@ public partial class WFCGenerator2D<T>
 
 
 	// returns true if the two given tiles match (or if one of them is not set)
-	private bool DoTilesMatch(T tile1, T tile2)
+	private bool DoTilesMatch(T tile1, T tile2, bool tile2CanBeZero = false )
 	{
-		bool match = false;
-
-		if ( tile1.Equals( zeroValue ) )
-			match = true;
-		if ( tile2.Equals( tile1 ) )
-			match = true;
-
-		return match;
+		return tile1.Equals( zeroValue ) || tile2.Equals( tile1 ) || ( tile2CanBeZero && tile2.Equals( zeroValue ) );
 	}
 
 

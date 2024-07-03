@@ -162,6 +162,36 @@ public partial class Rule2D<T>
 	}
 
 
+	// Returns true if all tiles are zero 
+	public bool IsZero()
+	{
+		bool zero = true;
+
+		foreach ( var row in RuleArray )
+			foreach ( var tile in row )
+				if ( !tile.Equals( zeroValue ) )
+				{
+					zero = false;
+					break;
+				}
+
+		return zero;
+	}
+
+
+	// Returns true if any tile is zero 
+	public bool HasAnyZero()
+	{
+		foreach ( var row in RuleArray )
+			foreach ( var tile in row )
+				if ( tile.Equals( zeroValue ) )
+				{
+					return true;
+				}
+		return false;
+	}
+
+
 	// Prints the rule in console, for debugging purposes.
 	public void Print()
 	{

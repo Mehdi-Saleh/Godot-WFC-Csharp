@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=3 uid="uid://b68hgqqk0ygsl"]
+[gd_scene load_steps=60 format=3 uid="uid://b68hgqqk0ygsl"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hk8mx"]
 resource_name = "dirt"
@@ -1038,6 +1038,8 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_a8r10")
 
+[sub_resource type="BoxMesh" id="BoxMesh_v3srx"]
+
 [node name="AllTiles" type="Node3D"]
 
 [node name="tile" type="MeshInstance3D" parent="."]
@@ -1045,12 +1047,7 @@ mesh = SubResource("ArrayMesh_tpnld")
 skeleton = NodePath("")
 
 [node name="tile_bump" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
-mesh = SubResource("ArrayMesh_87562")
-skeleton = NodePath("")
-
-[node name="tile_bump2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 6, 0, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 mesh = SubResource("ArrayMesh_87562")
 skeleton = NodePath("")
 
@@ -1065,146 +1062,45 @@ mesh = SubResource("ArrayMesh_gm0ob")
 skeleton = NodePath("")
 
 [node name="tile_cornerRound" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 mesh = SubResource("ArrayMesh_p8ais")
 skeleton = NodePath("")
 
 [node name="tile_cornerSquare" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
 mesh = SubResource("ArrayMesh_n17qn")
 skeleton = NodePath("")
 
 [node name="tile_crossing" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
 mesh = SubResource("ArrayMesh_fgrmd")
 skeleton = NodePath("")
 
 [node name="tile_riverBridge" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 6)
 mesh = SubResource("ArrayMesh_18g6e")
 skeleton = NodePath("")
 
 [node name="tile_riverCorner" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 6)
 mesh = SubResource("ArrayMesh_47xwu")
 skeleton = NodePath("")
 
 [node name="tile_straight" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 2)
-mesh = SubResource("ArrayMesh_0bi7x")
-skeleton = NodePath("")
-
-[node name="tile_cornerInner2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 0, 2)
-mesh = SubResource("ArrayMesh_mqql0")
-skeleton = NodePath("")
-
-[node name="tile_cornerOuter2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 4, 0, 2)
-mesh = SubResource("ArrayMesh_gm0ob")
-skeleton = NodePath("")
-
-[node name="tile_cornerRound2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 8, 0, 2)
-mesh = SubResource("ArrayMesh_p8ais")
-skeleton = NodePath("")
-
-[node name="tile_cornerSquare2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 10, 0, 2)
-mesh = SubResource("ArrayMesh_n17qn")
-skeleton = NodePath("")
-
-[node name="tile_riverBridge2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 16, 0, 2)
-mesh = SubResource("ArrayMesh_18g6e")
-skeleton = NodePath("")
-
-[node name="tile_riverCorner2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 18, 0, 2)
-mesh = SubResource("ArrayMesh_47xwu")
-skeleton = NodePath("")
-
-[node name="tile_cornerInner3" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 2, 0, 4)
-mesh = SubResource("ArrayMesh_mqql0")
-skeleton = NodePath("")
-
-[node name="tile_cornerOuter3" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4, 0, 4)
-mesh = SubResource("ArrayMesh_gm0ob")
-skeleton = NodePath("")
-
-[node name="tile_cornerRound3" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 8, 0, 4)
-mesh = SubResource("ArrayMesh_p8ais")
-skeleton = NodePath("")
-
-[node name="tile_cornerSquare3" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 10, 0, 4)
-mesh = SubResource("ArrayMesh_n17qn")
-skeleton = NodePath("")
-
-[node name="tile_riverCorner3" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 18, 0, 4)
-mesh = SubResource("ArrayMesh_47xwu")
-skeleton = NodePath("")
-
-[node name="tile_cornerInner4" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 2, 0, 6)
-mesh = SubResource("ArrayMesh_mqql0")
-skeleton = NodePath("")
-
-[node name="tile_cornerOuter4" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 4, 0, 6)
-mesh = SubResource("ArrayMesh_gm0ob")
-skeleton = NodePath("")
-
-[node name="tile_cornerRound4" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 8, 0, 6)
-mesh = SubResource("ArrayMesh_p8ais")
-skeleton = NodePath("")
-
-[node name="tile_cornerSquare4" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 10, 0, 6)
-mesh = SubResource("ArrayMesh_n17qn")
-skeleton = NodePath("")
-
-[node name="tile_riverCorner4" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 18, 0, 6)
-mesh = SubResource("ArrayMesh_47xwu")
-skeleton = NodePath("")
-
-[node name="tile_straight2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 12, 0, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
 mesh = SubResource("ArrayMesh_0bi7x")
 skeleton = NodePath("")
 
 [node name="tile_riverStraight" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 4)
-mesh = SubResource("ArrayMesh_5f75f")
-skeleton = NodePath("")
-
-[node name="tile_riverStraight2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 16, 0, 6)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 6)
 mesh = SubResource("ArrayMesh_5f75f")
 skeleton = NodePath("")
 
 [node name="tile_endRound" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
 mesh = SubResource("ArrayMesh_le08f")
 skeleton = NodePath("")
 
-[node name="tile_endRound2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 14, 0, 2)
-mesh = SubResource("ArrayMesh_le08f")
-skeleton = NodePath("")
-
-[node name="tile_endRound3" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 14, 0, 4)
-mesh = SubResource("ArrayMesh_le08f")
-skeleton = NodePath("")
-
-[node name="tile_endRound4" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 14, 0, 6)
-mesh = SubResource("ArrayMesh_le08f")
-skeleton = NodePath("")
+[node name="brick" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, 0)
+mesh = SubResource("BoxMesh_v3srx")
