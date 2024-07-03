@@ -13,6 +13,7 @@ public partial class WFC2DGridMap : Node
 	[ Export ] public Vector2I dimensions;
 	[ Export ] public int matchRadius = 1;
 	[ Export ] public int correctionRadius = 3;
+	[ Export ] public int correctionRadiusIncrementEvery = 10;
 	[ Export ] public WFCGenerator2D<ItemAndOrientation>.GenerationType generationType = WFCGenerator2D<ItemAndOrientation>.GenerationType.Intelligent;
 	[ Export ] public bool chooseByProbablity = false;
 	[ Export ] public bool showCurrentProgress = true;
@@ -23,6 +24,7 @@ public partial class WFC2DGridMap : Node
 	{
 		var sampleArray = ExtractSample();
 		generator = new WFCGenerator2D<ItemAndOrientation>( new ItemAndOrientation( -1, -1 ), dimensions.X, dimensions.Y, sampleArray, matchRadius, correctionRadius, generationType, chooseByProbablity );
+		generator.CORRECTION_RADIUS_INR_EVERY = this.correctionRadiusIncrementEvery;
 		generator.OnGenerationTaskDone = OnGenerationTaskDone;
 		sample.Hide();
 

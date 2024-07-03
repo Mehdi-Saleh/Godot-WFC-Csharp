@@ -15,6 +15,7 @@ public partial class WFCGenerator2D<T>
 	private int height = 50, width = 30; // Map size, horizontal and vertical
 	public int MATCH_RADIUS = 1; // The radius around a tile check for matching tiles with sample
 	public int CORRECTION_RADIUS = 2; // The radius around a failed tile that will be cleared on fixing. A number bigger than MATCH_RADIUS is recommended.
+	public int CORRECTION_RADIUS_INR_EVERY = 10;
 	public GenerationType generationType = GenerationType.Intelligent; // Currently supports one mode only
 	public bool chooseByProbablity = false; // If set to True, number of occurance for each tile will be taken into account when choosing tiles
 	public int maxN; // Total number of tiles which need to be set
@@ -36,7 +37,9 @@ public partial class WFCGenerator2D<T>
 	public List<List<T>> sample;
 
 	private bool failed = false; // Will be set to true if generation fails
-	private const int TRY_FIX_TIMES = 20; // Will try to fix fails this many times before giving up
+	private const int TRY_FIX_TIMES = 15; // Will try to fix fails this many times before giving up
+	private const int TRY_REGENERATE_TIMES = 10;
+	private int times_regenerated = 0;
 
 	private Task generationTask;
 	private bool taskLastState = true; // true means done
@@ -101,7 +104,17 @@ public partial class WFCGenerator2D<T>
 			taskLastState = generationTask.IsCompleted;
 			if ( taskLastState )
 			{
-				OnGenerationTaskDone();
+				if ( failed && times_regenerated < TRY_REGENERATE_TIMES )
+				{
+					taskLastState = false;
+					times_regenerated++;
+					GD.Print( times_regenerated );
+					GenerateMap( true, true );
+				}
+				else
+				{
+					OnGenerationTaskDone();
+				}
 			}
 		}
 	}
@@ -117,7 +130,7 @@ public partial class WFCGenerator2D<T>
 
 
 	// Generates Map
-	private void _GenerateMap( bool clearTarget = true, bool shouldFixFails = true )
+	private async void _GenerateMap( bool clearTarget = true, bool shouldFixFails = true )
 	{
 		if ( clearTarget ) 
 			ClearMap();
@@ -149,7 +162,8 @@ public partial class WFCGenerator2D<T>
 		if ( shouldFixFails )
 			for ( int i=0; i<TRY_FIX_TIMES && failed; i++ )
 			{
-				FixFail();
+				failed = false;
+				FixFail( CORRECTION_RADIUS + i / CORRECTION_RADIUS_INR_EVERY );
 			}
 	}
 
@@ -202,18 +216,18 @@ public partial class WFCGenerator2D<T>
 
 
 	// Called on fail to redraw failed parts
-	private void FixFail()
+	private void FixFail( int radius )
 	{
 		int clearedCount = 0;
 		foreach ( Vector2I tile in GetEmptyTiles() )
 		{
-			clearedCount += ClearRadius( tile, MATCH_RADIUS*2 );
+			clearedCount += ClearRadius( tile, radius );
 			clearedCount++; // Because we need to count the middle tile (which is already empty) as well
 		}
 		currentN = maxN - clearedCount;
 
 		failed = false;
-		GenerateMap( false, false );
+		_GenerateMap( false, false );
 	}
 
 
@@ -290,7 +304,7 @@ public partial class WFCGenerator2D<T>
 					for ( j = -MATCH_RADIUS; j <= MATCH_RADIUS && !b; j++ )
 					{
 						bool anyMatch = false;
-						foreach ( Rule2D< T > rule in usedRules[ tileValue ] )
+						foreach ( Rule2D<T> rule in usedRules[ tileValue ] )
 						{
 							anyMatch = anyMatch || DoTilesMatch( GetTile( coord + new Vector2I( i, j ) ), rule.RuleArray[ MATCH_RADIUS+i ][ MATCH_RADIUS+j ] ) ;
 						}
@@ -514,6 +528,7 @@ public partial class WFCGenerator2D<T>
 		taskLastState = true;
 		currentN = 0;
 		failed = false;
+		times_regenerated = 0;
 
 		// Create new arrays
 		tilesArray = new List<List<T>>( height + MATCH_RADIUS * 2 );
