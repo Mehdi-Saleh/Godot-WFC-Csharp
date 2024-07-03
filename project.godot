@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="WFC-2d"
-run/main_scene="res://Examples/Example1.tscn"
+config/name="Wave Function Collapse"
+run/main_scene="res://Examples/Example1-TileMap.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 

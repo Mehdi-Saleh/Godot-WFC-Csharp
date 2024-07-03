@@ -1,3 +1,4 @@
 res://Examples/Example1.tscn
-res://Examples/WFC2DTileMap.cs
+res://Examples/Example1-TileMap.tscn
+res://Assets/Scripts/WFC2DTileMap.cs
 res://ProgressBarScript.cs
