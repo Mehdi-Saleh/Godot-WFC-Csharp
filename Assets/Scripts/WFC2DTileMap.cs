@@ -12,8 +12,10 @@ public partial class WFC2DTileMap : Node
 	[ Export ] public Vector2I dimensions;
 	[ Export ] public int matchRadius = 1;
 	[ Export ] public int correctionRadius = 3;
+	[ Export ] public int correctionRadiusIncrementEvery = 10;
 	[ Export ] public WFCGenerator2D<Vector2I>.GenerationType generationType = WFCGenerator2D<Vector2I>.GenerationType.Intelligent;
-	[ Export ] public bool chooseByProbablity = false;
+	[ Export ] public bool chooseByProbability = false;
+	[ Export ] public ProbabilityImportance probabilityImportance = ProbabilityImportance.NORMAL;
 	[ Export ] public bool showCurrentProgress = true;
 	[ Export ] public bool updateProgressBar = true;
 
@@ -21,7 +23,14 @@ public partial class WFC2DTileMap : Node
 	public override void _Ready()
 	{
 		var sampleArray = ExtractSample();
-		generator = new WFCGenerator2D<Vector2I>( new Vector2I( -1, -1 ), dimensions.X, dimensions.Y, sampleArray, matchRadius, correctionRadius, generationType, chooseByProbablity );
+
+		generator = new WFCGenerator2D<Vector2I>(
+			new Vector2I( -1, -1 ), dimensions.X, dimensions.Y, sampleArray,
+			matchRadius, correctionRadius, correctionRadiusIncrementEvery,
+			generationType, chooseByProbability,
+			probabilityImportance 
+			);
+
 		generator.OnGenerationTaskDone = OnGenerationTaskDone;
 		sample.Hide();
 

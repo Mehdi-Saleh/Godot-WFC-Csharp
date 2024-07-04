@@ -18,6 +18,7 @@ public partial class WFCGenerator2D<T>
 	public int CORRECTION_RADIUS_INR_EVERY = 10;
 	public GenerationType generationType = GenerationType.Intelligent; // Currently supports one mode only
 	public bool chooseByProbablity = false; // If set to True, number of occurance for each tile will be taken into account when choosing tiles
+	public ProbabilityImportance probabilityImportance = ProbabilityImportance.NORMAL;
 	public int maxN; // Total number of tiles which need to be set
 	public int currentN = 0; // Number of tiles that are currently set
 
@@ -51,7 +52,7 @@ public partial class WFCGenerator2D<T>
 	public Action OnGenerationTaskDone;
 
 
-	public WFCGenerator2D( T zeroValue, int height, int width, List<List<T>> sample, int match_radius, int correctionRadius, GenerationType generationType, bool chooseByProbablity )
+	public WFCGenerator2D( T zeroValue, int height, int width, List<List<T>> sample, int match_radius, int correctionRadius, int correctionRadiusIncrement, GenerationType generationType, bool chooseByProbablity, ProbabilityImportance probabilityImportance )
 	{
 		this.zeroValue = zeroValue;
 		this.height = height;
@@ -59,8 +60,10 @@ public partial class WFCGenerator2D<T>
 		this.sample = sample;
 		this.MATCH_RADIUS = match_radius;
 		this.CORRECTION_RADIUS = correctionRadius;
+		this.CORRECTION_RADIUS_INR_EVERY = correctionRadiusIncrement;
 		this.generationType = generationType;
 		this.chooseByProbablity = chooseByProbablity;
+		this.probabilityImportance = probabilityImportance;
 	}
 
 
@@ -343,17 +346,17 @@ public partial class WFCGenerator2D<T>
 		if (options.Count==0)
 			return zeroValue;
 		
-		int sum = 0;
+		float sum = 0;
 		foreach (T option in options)
 		{
-			sum += tilesRepeatitions[option];
+			sum += ( float ) Mathf.Pow( tilesRepeatitions[option], ( float ) probabilityImportance * 0.5 );
 		}
 
-		int temp = 0;
-		int rand = (int) GD.Randi() % sum;
+		float temp = 0;
+		float rand = (float) GD.Randi() % sum;
 		foreach (T option in options)
 		{
-			temp += tilesRepeatitions[option];
+			temp += ( float ) Mathf.Pow( tilesRepeatitions[option], ( float ) probabilityImportance * 0.5 );
 			if (temp>=rand)
 				return option;
 		}
@@ -562,4 +565,13 @@ public partial class WFCGenerator2D<T>
 		// Exact,
 		Intelligent
 	}
+}
+
+
+
+public enum ProbabilityImportance
+{
+	NORMAL = 2,
+	HIGH = 4,
+	LOW = 1,
 }
