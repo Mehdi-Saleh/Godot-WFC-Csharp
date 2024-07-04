@@ -10,10 +10,12 @@ Features:
 - Create map based on a sample
 - Differnt match levels are possible (through changing MATCH_RADIUS)
 - Multi-threading
-- Possibility analysis from sample
+- Possibility based tile placement
 - Fail correction
+- Has a base generator class that can be expanded for your use
   
 To Do:
 - Chunk-based multithreading
+- 3D generation
 
-made with Godot v4.1.3
+made with Godot v4.2.1
