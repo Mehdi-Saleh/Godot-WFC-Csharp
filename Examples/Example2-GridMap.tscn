@@ -49,7 +49,7 @@ progressBar = NodePath("../UI/ProgressBar")
 dimensions = Vector2i(30, 30)
 correctionRadius = 2
 correctionRadiusIncrementEvery = 8
-chooseByProbablity = true
+chooseByProbability = true
 
 [node name="Target" type="GridMap" parent="WFC Generator"]
 mesh_library = ExtResource("1_oooj5")
