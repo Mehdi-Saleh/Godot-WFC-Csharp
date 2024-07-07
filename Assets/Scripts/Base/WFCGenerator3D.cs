@@ -52,8 +52,10 @@ public partial class WFCGenerator3D<T>
 
 	public Action OnGenerationTaskDone;
 
+	public T floorTile;
 
-	public WFCGenerator3D( T zeroValue, int height, int width, int depth, List<List<List<T>>> sample, int match_radius, int correctionRadius, int correctionRadiusIncrement, GenerationType generationType, bool chooseByProbablity, ProbabilityImportance probabilityImportance )
+
+	public WFCGenerator3D( T zeroValue, int height, int width, int depth, List<List<List<T>>> sample, int match_radius, int correctionRadius, int correctionRadiusIncrement, GenerationType generationType, bool chooseByProbablity, ProbabilityImportance probabilityImportance, T floorTile )
 	{
 		this.zeroValue = zeroValue;
 		this.height = height;
@@ -66,6 +68,7 @@ public partial class WFCGenerator3D<T>
 		this.generationType = generationType;
 		this.chooseByProbablity = chooseByProbablity;
 		this.probabilityImportance = probabilityImportance;
+		this.floorTile = floorTile;
 	}
 
 
@@ -76,6 +79,7 @@ public partial class WFCGenerator3D<T>
 	// Called when the node enters the scene tree for the first time. Needs to be called by another class after generating this class.
 	public async void Ready()
 	{
+		
 		tilesArray = new List<List<List<T>>>( height + MATCH_RADIUS * 2 );
 		for ( int i = 0; i < height + MATCH_RADIUS * 2; i++ )
 		{
@@ -104,6 +108,9 @@ public partial class WFCGenerator3D<T>
 		Init(); // Needs to be called to initialize usedTiles (to create rules)
 		ClearMap();
 		UpdateCountAll();
+
+
+		// FillFloor( floorTile );
 		GenerateMap();
 	}
 
@@ -146,7 +153,11 @@ public partial class WFCGenerator3D<T>
 	private async void _GenerateMap( bool clearTarget = true, bool shouldFixFails = true )
 	{
 		if ( clearTarget ) 
+		{
 			ClearMap();
+		}
+		FillFloor( floorTile );
+
 		UpdateCountAll();
 
 		while ( currentN < maxN )
@@ -171,6 +182,8 @@ public partial class WFCGenerator3D<T>
 			currentN++;
 		}
 
+		// failed = false;
+		// return;
 		if ( shouldFixFails )
 			for ( int i=0; i<TRY_FIX_TIMES && failed; i++ )
 			{
@@ -191,7 +204,7 @@ public partial class WFCGenerator3D<T>
 				{
 					T cellValue = sample[ i ][ j ][ k ];
 
-					if ( cellValue.Equals( zeroValue ) )
+					if ( cellValue.Equals( zeroValue ) || cellValue.Equals( floorTile ) )
 					{
 						continue;
 					}
@@ -213,7 +226,6 @@ public partial class WFCGenerator3D<T>
 					if ( !repeated )
 					{
 						usedRules[ cellValue ].Add( rule );
-						rule.Print();
 					}
 
 
@@ -309,7 +321,7 @@ public partial class WFCGenerator3D<T>
 							{
 								anyMatch = anyMatch || DoTilesMatch( GetTile( coord + new Vector3I( i, j, k ) ), rule.RuleArray[ MATCH_RADIUS+i ][ MATCH_RADIUS+j ][ MATCH_RADIUS+k ] ) ;
 							}
-							if (!anyMatch)
+							if ( !anyMatch )
 							{
 								f = false;
 								b = true;
@@ -496,6 +508,25 @@ public partial class WFCGenerator3D<T>
 					tiles.Add( new Vector3I( i, j, k ) );
 		
 		return tiles;
+	}
+
+
+	// Fills the specified cube with the given tile 
+	private void FillArea( Vector3I from, Vector3I to, T item )
+	{
+		for ( int i = from.X; i <= to.X; i++ )
+			for ( int j = from.Y; j <= to.Y; j++ )
+				for ( int k = from.Z; k <= to.Z; k++ )
+				{
+					SetTile( i, j, k, item );
+				}
+	}
+
+
+	// Fills depth of 0 with the given item
+	private void FillFloor( T itemToUse )
+	{
+		FillArea( Vector3I.Zero, new Vector3I( height, 0, depth ), itemToUse );
 	}
 
 

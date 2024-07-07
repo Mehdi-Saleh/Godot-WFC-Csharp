@@ -20,6 +20,11 @@ public partial class WFC3DGridMap : Node
 	[ Export ] public bool showCurrentProgress = true;
 	[ Export ] public bool updateProgressBar = true;
 
+	private ItemAndOrientation airTile = new ItemAndOrientation( -2, 0 );
+	private ItemAndOrientation underGroundTile = new ItemAndOrientation( -3, 0 );
+	[ Export ] private int floorTileId = 0;
+	private int floorTileOrientation = 0;
+
 
 	public override void _Ready()
 	{
@@ -29,7 +34,7 @@ public partial class WFC3DGridMap : Node
 			new ItemAndOrientation( -1, -1 ), dimensions.X, dimensions.Y, dimensions.Z, sampleArray,
 			matchRadius, correctionRadius, correctionRadiusIncrementEvery,
 			generationType,
-			chooseByProbability, probabilityImportance 
+			chooseByProbability, probabilityImportance, new ItemAndOrientation( floorTileId, floorTileOrientation )
 			);
 
 		generator.OnGenerationTaskDone = OnGenerationTaskDone;
@@ -57,7 +62,7 @@ public partial class WFC3DGridMap : Node
 
 
 	// Returns an array of the tiles from the sample tile map.
-	public List<List<List<ItemAndOrientation>>> ExtractSample()
+	public List<List<List<ItemAndOrientation>>> ExtractSample( bool setFloorTile = false )
 	{
 		sampleArray.Clear();
 		
@@ -77,7 +82,6 @@ public partial class WFC3DGridMap : Node
 			max.Z = Math.Max( max.Z, cell.Z );
 		}
 
-		GD.Print( min, max );
 
 		for ( int i = min.X; i <= max.X; i++ )
 		{
@@ -86,11 +90,23 @@ public partial class WFC3DGridMap : Node
 			for ( int j = min.Y; j <= max.Y; j++ )
 			{
 				sampleArray[ i - min.X ].Add( new List<ItemAndOrientation>() );
+
+				// sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( underGroundTile.id, underGroundTile.orientation ) );	
+
 				for ( int k = min.Z; k <= max.Z; k++ )
 				{
 					Vector3I pos = new Vector3I( i, j, k );
-					sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( sample.GetCellItem( pos ), sample.GetCellItemOrientation( pos ) ) );
+					int cellItem = sample.GetCellItem( pos );
+					// VERY IMPORTANT this is because empty/air tiles are still actuall tiles. If we don't do this these tiles will be ignored and the 
+					// results may not be desirable!!
+					if ( cellItem == -1 )
+						sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( airTile.id, airTile.orientation ) );
+					else
+						sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( cellItem, sample.GetCellItemOrientation( pos ) ) );
 				}
+
+				for ( int k = 0; k < 3; k++ )
+					sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( airTile.id, airTile.orientation ) );
 			}
 		}
 
@@ -109,7 +125,11 @@ public partial class WFC3DGridMap : Node
 				for ( int k = 0; k < dimensions.Z; k++ )
 				{
 					ItemAndOrientation item = generator.GetTile( i, j, k );
-					target.SetCellItem( new Vector3I( i, j, k ), item.id, item.orientation );
+					if ( item.Equals( underGroundTile ) || item.Equals( airTile ) )
+						target.SetCellItem( new Vector3I( i, j, k ), -1, -1 );
+					else
+						target.SetCellItem( new Vector3I( i, j, k ), item.id, item.orientation );
+					
 				}
 	}
 
@@ -121,6 +141,7 @@ public partial class WFC3DGridMap : Node
 }
 
 
+[ Serializable ]
 public struct ItemAndOrientation
 {
 	public int id;
