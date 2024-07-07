@@ -202,7 +202,7 @@ public partial class WFCGenerator3D<T>
 						usedRules.Add( cellValue, new List<Rule3D<T>>() );
 					}
 
-					Rule3D<T> rule = new Rule3D<T>( MATCH_RADIUS, new Vector2I( i, j ), in sample, zeroValue );
+					Rule3D<T> rule = new Rule3D<T>( MATCH_RADIUS, new Vector3I( i, j, k ), in sample, zeroValue );
 					bool repeated = false;
 					foreach ( Rule3D<T> r in usedRules[ cellValue ] ) 
 						if ( r.CompareWith( rule ) )
@@ -468,7 +468,7 @@ public partial class WFCGenerator3D<T>
 					{
 						continue;
 					}
-					Vector2I tempCoord = new Vector2I(i, j);
+					Vector3I tempCoord = new Vector3I( i, j, k );
 					if ( !GetTile( tempCoord ).Equals( zeroValue ) )
 						clearedCount++;
 					SetTile( tempCoord, zeroValue );
@@ -478,51 +478,50 @@ public partial class WFCGenerator3D<T>
 	}
 
 
-	// *******************************************************
-
 	// Set every tilesArray cell in the specified radius and position to (-1, -1). Returns number of tiles that where not (-1, -1) before clearing.
-	private int ClearRadius( int i, int j, int radius )
+	private int ClearRadius( int i, int j, int k, int radius )
 	{
-		return ClearRadius( new Vector2I( i, j ), radius );
+		return ClearRadius( new Vector3I( i, j, k ), radius );
 	}
 
 
 	// Returns a list of all tiles that are empty. (-1, -1)
-	private List< Vector2I > GetEmptyTiles()
+	private List< Vector3I > GetEmptyTiles()
 	{
-		List< Vector2I > tiles = new List< Vector2I >();
+		List< Vector3I > tiles = new List< Vector3I >();
 		for ( int i = 0; i < height; i++ )
 			for ( int j = 0; j < width; j++ )
-				if ( GetTile( i, j ).Equals( zeroValue ) )
-					tiles.Add( new Vector2I( i, j ) );
+				for ( int k = 0; k < depth; k++ )
+				if ( GetTile( i, j, k ).Equals( zeroValue ) )
+					tiles.Add( new Vector3I( i, j, k ) );
 		
 		return tiles;
 	}
 
 
 	// Get tile from tilesArray using coordinates
-	public T GetTile( int coordX, int coordY )
+	public T GetTile( int coordX, int coordY, int coordZ )
 	{
-		return tilesArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ];
+		return tilesArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ][ coordZ + MATCH_RADIUS ];
 	}
 	// Get tile from tilesArray using coordinates
 
-	public T GetTile( Vector2I coord )
+	public T GetTile( Vector3I coord )
 	{
-		return GetTile( coord[ 0 ], coord[ 1 ] );
+		return GetTile( coord.X, coord.Y, coord.Z );
 	}
 
 
 	// Set tile on tilesArray using coordinates
-	private void SetTile( int coordX, int coordY, T value )
+	private void SetTile( int coordX, int coordY, int coordZ, T value )
 	{
-		tilesArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ] = value;
+		tilesArray[ coordX + MATCH_RADIUS ][ coordY + MATCH_RADIUS ][ coordZ + MATCH_RADIUS ] = value;
 	}
 
 	// Set tile on tilesArray using coordinates
-	private void SetTile( Vector2I coord, T value )
+	private void SetTile( Vector3I coord, T value )
 	{
-		SetTile( coord[ 0 ], coord[ 1 ], value );
+		SetTile( coord.X, coord.Y, coord.Z, value );
 	}
 
 
@@ -536,25 +535,33 @@ public partial class WFCGenerator3D<T>
 		times_regenerated = 0;
 
 		// Create new arrays
-		tilesArray = new List<List<T>>( height + MATCH_RADIUS * 2 );
+		tilesArray = new List<List<List<T>>>( height + MATCH_RADIUS * 2 );
 		for ( int i = 0; i < height + MATCH_RADIUS * 2; i++ )
 		{
-			tilesArray.Add( new List<T>( width + MATCH_RADIUS * 2 ) );
+			tilesArray.Add( new List<List<T>>( width + MATCH_RADIUS * 2 ) );
 			for ( int j = 0; j < width + MATCH_RADIUS * 2; j++ )
-				tilesArray[ i ].Add( zeroValue );
+			{
+				tilesArray[ i ].Add( new List<T>(depth + MATCH_RADIUS * 2 ) );
+				for ( int k = 0; k < depth + MATCH_RADIUS * 2; k++ )
+					tilesArray[ i ][ j ].Add( zeroValue );
+			}
 		}
 
-		tilesCounts = new List<List<int>>( height );
+		tilesCounts = new List<List<List<int>>>( height );
 		for (int i = 0; i < height + MATCH_RADIUS * 2; i++)
 		{
-			tilesCounts.Add( new List<int>( width ) );
+			tilesCounts.Add( new List<List<int>>( width ) );
 			for ( int j = 0; j < width; j++ )
-				tilesCounts[ i ].Add( -1 );
+			{
+				tilesCounts[ i ].Add( new List<int>( depth ) );
+				for ( int k = 0; k < depth; k++ )
+					tilesCounts[ i ][ j ].Add( -1 );
+			}
 		}
 
 		
 		// Generate
-		maxN = height * width;
+		maxN = height * width * depth;
 		ClearMap();
 		UpdateCountAll();
 		GenerateMap();

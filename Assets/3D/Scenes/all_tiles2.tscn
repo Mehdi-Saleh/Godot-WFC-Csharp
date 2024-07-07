@@ -1628,7 +1628,6 @@ metallic = 1.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fpjr8"]
 resource_name = "_defaultMat"
-albedo_color = Color(1, 1, 1, 1)
 metallic = 1.0
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_3l2rg"]
@@ -1692,7 +1691,6 @@ metallic = 1.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_27rja"]
 resource_name = "_defaultMat"
-albedo_color = Color(1, 1, 1, 1)
 metallic = 1.0
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_ke3eu"]

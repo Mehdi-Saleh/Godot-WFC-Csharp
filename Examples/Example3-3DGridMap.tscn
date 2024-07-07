@@ -1,5 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://duuuv1m6prcwi"]
+[gd_scene load_steps=11 format=3 uid="uid://duuuv1m6prcwi"]
 
+[ext_resource type="Script" path="res://Assets/Scripts/WFC3DGridMap.cs" id="1_siybu"]
 [ext_resource type="MeshLibrary" uid="uid://dysgxrba7xn4e" path="res://Assets/3D/Scenes/mesh_library.tres" id="2_smc2n"]
 [ext_resource type="Script" path="res://ProgressBarScript.cs" id="3_bwlwq"]
 [ext_resource type="MeshLibrary" uid="uid://rvrjj7y8x53e" path="res://Assets/3D/Scenes/mesh_library_towers.tres" id="3_wsix3"]
@@ -41,7 +42,12 @@ shadow_enabled = true
 [node name="Camera2D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.559395, 0.828901, 0, -0.828901, 0.559395, 13.616, 13.054, 31.758)
 
-[node name="WFC Generator" type="Node" parent="."]
+[node name="WFC Generator" type="Node" parent="." node_paths=PackedStringArray("target", "sample", "progressBar")]
+script = ExtResource("1_siybu")
+target = NodePath("Target")
+sample = NodePath("Sample")
+progressBar = NodePath("../UI/ProgressBar")
+dimensions = Vector3i(20, 10, 20)
 
 [node name="Target" type="GridMap" parent="WFC Generator"]
 mesh_library = ExtResource("2_smc2n")

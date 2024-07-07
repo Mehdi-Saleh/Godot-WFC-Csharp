@@ -12,18 +12,18 @@ public partial class Rule2D<T>
 	// This is the array of tiles that create this rule.
 	public List<List<T>> RuleArray { get; private set; }
 	protected static Vector2I Vector_1 = new Vector2I( -1, -1 );
-	private T zeroValue;
+	private static T ZeroValue;
 
 
 	public Rule2D( int matchRadius, T zeroValue )
 	{
-		this.zeroValue = zeroValue;
+		ZeroValue = zeroValue;
 		CreateRuleArray( matchRadius );
 	}
 
 	public Rule2D( int matchRadius, T[,] suroundings, T zeroValue )
 	{
-		this.zeroValue = zeroValue;
+		ZeroValue = zeroValue;
 		CreateRuleArray( matchRadius );
 		for ( int i = 0; i < RuleArray.Count; i++ )
 			for ( int j = 0; j < RuleArray.Count; j++ )
@@ -34,7 +34,7 @@ public partial class Rule2D<T>
 
 	public Rule2D( int matchRadius, Vector2I position, in List<List<T>> sample, T zeroValue )
 	{
-		this.zeroValue = zeroValue;
+		ZeroValue = zeroValue;
 		CreateRuleArray( matchRadius );
 		for ( int i = 0; i < RuleArray.Count; i++ )
 			for ( int j = 0; j < RuleArray.Count; j++ )
@@ -52,7 +52,7 @@ public partial class Rule2D<T>
 	
 	public Rule2D( int matchRadius, Vector2I position, in List<List<T>> tilesArray,  T zeroValue, bool offsetPos=true )
 	{
-		this.zeroValue = zeroValue;
+		ZeroValue = zeroValue;
 		CreateRuleArray( matchRadius );
 		for ( int i = 0; i < RuleArray.Count; i++ )
 			for ( int j = 0; j < RuleArray.Count; j++ )
@@ -73,7 +73,7 @@ public partial class Rule2D<T>
 		{
 			RuleArray.Add( new List<T>( 1 + matchRadius*2 ) );
 			for ( int j = 0; j < 1 + matchRadius*2; j++ )
-				RuleArray[i].Add( zeroValue );
+				RuleArray[i].Add( ZeroValue );
 		}
 	}
 
@@ -116,7 +116,7 @@ public partial class Rule2D<T>
 		for ( int i = 0; i < RuleArray.Count; i++ )
 			for ( int j = 0; j < RuleArray.Count; j++ )
 			{
-				if ( !tilesArray[ i, j ].Equals( zeroValue ) && !tilesArray[ i, j ].Equals( RuleArray[ i ][ j ] ) )
+				if ( !tilesArray[ i, j ].Equals( ZeroValue ) && !tilesArray[ i, j ].Equals( RuleArray[ i ][ j ] ) )
 					return false;
 			}
 		
@@ -169,7 +169,7 @@ public partial class Rule2D<T>
 
 		foreach ( var row in RuleArray )
 			foreach ( var tile in row )
-				if ( !tile.Equals( zeroValue ) )
+				if ( !tile.Equals( ZeroValue ) )
 				{
 					zero = false;
 					break;
@@ -184,7 +184,7 @@ public partial class Rule2D<T>
 	{
 		foreach ( var row in RuleArray )
 			foreach ( var tile in row )
-				if ( tile.Equals( zeroValue ) )
+				if ( tile.Equals( ZeroValue ) )
 				{
 					return true;
 				}
