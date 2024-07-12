@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WFC-2d")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3f27bdba3388e84b60b5f56e1c61f50180be02b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+57a9521002a2824a9a7a34729e4485bc87c7dc12")]
 [assembly: System.Reflection.AssemblyProductAttribute("WFC-2d")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WFC-2d")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

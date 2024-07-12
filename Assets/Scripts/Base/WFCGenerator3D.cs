@@ -108,9 +108,6 @@ public partial class WFCGenerator3D<T>
 		Init(); // Needs to be called to initialize usedTiles (to create rules)
 		ClearMap();
 		UpdateCountAll();
-
-
-		// FillFloor( floorTile );
 		GenerateMap();
 	}
 

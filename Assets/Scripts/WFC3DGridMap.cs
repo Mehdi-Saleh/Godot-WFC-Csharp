@@ -105,7 +105,7 @@ public partial class WFC3DGridMap : Node
 						sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( cellItem, sample.GetCellItemOrientation( pos ) ) );
 				}
 
-				for ( int k = 0; k < 3; k++ )
+				for ( int k = 0; k < matchRadius*2+1; k++ )
 					sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( airTile.id, airTile.orientation ) );
 			}
 		}
