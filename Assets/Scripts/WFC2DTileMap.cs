@@ -38,14 +38,14 @@ public partial class WFC2DTileMap : Node
 	}
 
 
-    public override void _Process( double delta )
-    {
-        generator.Process( delta );
+	public override void _Process( double delta )
+	{
+		generator.Process( delta );
 		if ( showCurrentProgress )
 			ApplyTileMapArray();
 		if ( updateProgressBar )
 			progressBar.Value = generator.Progress;
-    }
+	}
 
 
 	// Called when the generation is finished

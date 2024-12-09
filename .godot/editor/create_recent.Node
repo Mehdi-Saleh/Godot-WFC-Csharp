@@ -1,6 +1,6 @@
-GridMap
 MeshInstance3D
 Node3D
+GridMap
 MultiMeshInstance3D
 Camera3D
 CanvasLayer

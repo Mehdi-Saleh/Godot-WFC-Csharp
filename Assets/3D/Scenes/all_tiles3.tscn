@@ -1,0 +1,72 @@
+[gd_scene load_steps=12 format=3 uid="uid://b2b223fd6fts7"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_un57r"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hd7gg"]
+albedo_color = Color(0.294118, 0.301961, 0.305882, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_h6gql"]
+size = Vector3(0.5, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nsqr8"]
+size = Vector3(0.5, 1, 0.5)
+
+[sub_resource type="PrismMesh" id="PrismMesh_kk57l"]
+left_to_right = 0.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a1135"]
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_52uwd"]
+albedo_color = Color(0.501961, 0.0235294, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qn04u"]
+size = Vector3(1, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rsxds"]
+albedo_color = Color(0, 0.0941176, 0.34902, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vomoa"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0i6bp"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.141176)
+disable_receive_shadows = true
+
+[node name="AllTiles3" type="Node3D"]
+
+[node name="Fill" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_un57r")
+surface_material_override/0 = SubResource("StandardMaterial3D_hd7gg")
+
+[node name="Wall" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+mesh = SubResource("BoxMesh_h6gql")
+surface_material_override/0 = SubResource("StandardMaterial3D_hd7gg")
+
+[node name="WallCorner" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+mesh = SubResource("BoxMesh_nsqr8")
+surface_material_override/0 = SubResource("StandardMaterial3D_hd7gg")
+
+[node name="Roof" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+mesh = SubResource("PrismMesh_kk57l")
+surface_material_override/0 = SubResource("StandardMaterial3D_hd7gg")
+
+[node name="Cylinder" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+mesh = SubResource("CylinderMesh_a1135")
+surface_material_override/0 = SubResource("StandardMaterial3D_52uwd")
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
+mesh = SubResource("BoxMesh_qn04u")
+surface_material_override/0 = SubResource("StandardMaterial3D_rsxds")
+
+[node name="Air" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+mesh = SubResource("BoxMesh_vomoa")
+surface_material_override/0 = SubResource("StandardMaterial3D_0i6bp")

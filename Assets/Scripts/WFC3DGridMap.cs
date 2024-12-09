@@ -44,14 +44,14 @@ public partial class WFC3DGridMap : Node
 	}
 
 
-    public override void _Process( double delta )
-    {
-        generator.Process( delta );
+	public override void _Process( double delta )
+	{
+		generator.Process( delta );
 		if ( showCurrentProgress )
 			ApplyTileMapArray();
 		if ( updateProgressBar )
 			progressBar.Value = generator.Progress;
-    }
+	}
 
 
 	// Called when the generation is finished
@@ -82,6 +82,9 @@ public partial class WFC3DGridMap : Node
 			max.Z = Math.Max( max.Z, cell.Z );
 		}
 
+		min -= Vector3I.One;
+		max += Vector3I.One;
+
 
 		for ( int i = min.X; i <= max.X; i++ )
 		{
@@ -99,9 +102,9 @@ public partial class WFC3DGridMap : Node
 					int cellItem = sample.GetCellItem( pos );
 					// VERY IMPORTANT this is because empty/air tiles are still actuall tiles. If we don't do this these tiles will be ignored and the 
 					// results may not be desirable!!
-					if ( cellItem == -1 )
-						sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( airTile.id, airTile.orientation ) );
-					else
+					// if ( cellItem == -1 )
+					// 	sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( airTile.id, airTile.orientation ) );
+					// else
 						sampleArray[ i - min.X ][ j - min.Y ].Add( new ItemAndOrientation( cellItem, sample.GetCellItemOrientation( pos ) ) );
 				}
 
@@ -154,20 +157,20 @@ public struct ItemAndOrientation
 	}
 
 
-    public override bool Equals( [NotNullWhen(true)] object obj )
-    {
+	public override bool Equals( [NotNullWhen(true)] object obj )
+	{
 		if ( obj.GetType() == typeof( ItemAndOrientation ) )
 		{
 			ItemAndOrientation newObj = ( ItemAndOrientation ) obj;
 			return newObj.id == id && newObj.orientation == orientation;
 		}
 
-        return base.Equals(obj);
-    }
+		return base.Equals(obj);
+	}
 
 
-    public override string ToString()
-    {
-        return "( " + id + ", " + orientation + " )";
-    }
+	public override string ToString()
+	{
+		return "( " + id + ", " + orientation + " )";
+	}
 }

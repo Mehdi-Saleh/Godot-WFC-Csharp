@@ -154,6 +154,8 @@ public partial class WFCGenerator3D<T>
 			ClearMap();
 		}
 		FillFloor( floorTile );
+		// SetTile( new Vector3I( 0, 0, 0 ), floorTile );
+
 
 		UpdateCountAll();
 
