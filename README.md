@@ -1,6 +1,7 @@
 # Godot-WFC-Csharp
 
 ![ScreenShot](./Screenshots/screenshot1.png)
+![ScreenShot](./Screenshots/screenshot3D-1.png)
 
 This is a wave function collapse implementation for Godot in C#.
 
@@ -13,10 +14,10 @@ Features:
 - Possibility based tile placement
 - Fail correction
 - Has a base generator class that can be expanded for your use
-- Currently has built in support for TileMap2D and GridMap( 2D only )
+- 2D and 3D generation
+- Currently has built in support for TileMap2D and GridMap( 2D or 3D )
   
 To Do:
 - Chunk-based multithreading
-- 3D generation
 
 made with Godot v4.2.1
